@@ -1,0 +1,19 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ProductForm from '../../components/ProductForm';
+import SelectSeller from '../../components/SelectSeller';
+
+const url = new URL(Astro.request.url);
+const sellerSlug = url.searchParams.get('client');
+---
+
+<AdminLayout title="Agregar Producto" maxWidth={sellerSlug ? 'max-w-2xl' : 'max-w-6xl'}>
+  {sellerSlug ? (
+    <ProductForm client:load />
+  ) : (
+    <>
+      <p class="text-sm text-gray-500 mb-6">Seleccioná el vendedor al que querés agregarle un producto:</p>
+      <SelectSeller client:load />
+    </>
+  )}
+</AdminLayout>

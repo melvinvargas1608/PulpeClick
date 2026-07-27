@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* ============================================
+   PulpeClick Design Tokens
+   Source: marca.txt — identidad visual existente
+   ============================================ */
+
+@theme {
+  /* ── Tipografía ─────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ── Paleta de marca ────────────────────── */
+  /* Turquesa — navegación, header, categorías, iconos, botones secundarios */
+  --color-brand: #17877f;
+  --color-brand-dark: #136b65; /* darken 10% */
+  --color-brand-light: #e8f5f4;
+
+  /* Naranja — precios, promociones, botones CTA, indicadores importantes */
+  --color-hot: #ff8e00;
+  --color-hot-dark: #e67e00;
+  --color-hot-light: #fff3e0;
+
+  /* Azul profundo — footer, estadísticas, info institucional, badges premium */
+  --color-deep: #0f4c81;
+  --color-deep-dark: #0b3d66;
+  --color-deep-light: #e8eff6;
+
+  /* ── Radios ─────────────────────────────── */
+  --radius-card: 16px;
+  --radius-btn: 12px;
+
+  /* ── Sombras (muy suaves, spec) ─────────── */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 16px 0 rgb(0 0 0 / 0.08),
+    0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-floating: 0 8px 24px 0 rgb(0 0 0 / 0.12);
+}
+
+/* ── Capa base ────────────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+
+  body {
+    @apply bg-white text-gray-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  /* Nunca fondos completamente negros — regla de marca.txt */
+  /* En su lugar usar gray-900 máximo para texto, deep para fondos oscuros */
+}
+
+/* ── Utilidades ───────────────────────────── */
+@layer utilities {
+  /* Zoom suave en hover para imágenes de producto dentro de cards */
+  .card-zoom-img {
+    transition: transform 0.35s ease;
+  }
+  .card-zoom:hover .card-zoom-img {
+    transform: scale(1.05);
+  }
+}

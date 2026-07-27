@@ -1,0 +1,50 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Panel Admin">
+  <div class="max-w-2xl mx-auto px-4 py-6 min-h-[80dvh] flex flex-col justify-center">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 text-center">Panel de Administración</h1>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="/admin/nuevo-vendedor" class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+        <h2 class="font-semibold text-gray-900 text-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle mr-2 text-brand"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+          Nuevo Vendedor
+        </h2>
+        <p class="text-sm text-gray-500 mt-2">Registrar un nuevo vendedor</p>
+      </a>
+      
+      <a href="/admin/vendedores" class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+        <h2 class="font-semibold text-gray-900 text-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle mr-2 text-brand"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Vendedores
+        </h2>
+        <p class="text-sm text-gray-500 mt-2">Ver vendedores y gestionar sus productos</p>
+      </a>
+      
+      <a href="/admin/nuevo-producto" class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+        <h2 class="font-semibold text-gray-900 text-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle mr-2 text-brand"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+          Agregar Producto
+        </h2>
+        <p class="text-sm text-gray-500 mt-2">Seleccioná un vendedor y agregale productos con IA</p>
+      </a>
+
+      <a href="/admin/categorias" class="block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+        <h2 class="font-semibold text-gray-900 text-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block align-middle mr-2 text-brand"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>
+          Categorías
+        </h2>
+        <p class="text-sm text-gray-500 mt-2">Crear, editar y eliminar categorías de productos</p>
+      </a>
+    </div>
+
+    <div class="text-center mt-8">
+      <a href="/admin/logout" class="text-xs text-gray-400 hover:text-red-500 transition-colors">
+        Cerrar sesión
+      </a>
+    </div>
+  </div>
+</Layout>

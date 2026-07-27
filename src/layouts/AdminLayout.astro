@@ -1,0 +1,23 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  backHref?: string;
+  maxWidth?: string;
+}
+
+const { title, backHref = '/admin', maxWidth = 'max-w-2xl' } = Astro.props;
+---
+<Layout title={title}>
+  <div class={`${maxWidth} mx-auto px-4 py-6`}>
+    <div class="flex items-center justify-between mb-6">
+      <a href={backHref} class="text-brand text-sm inline-block">← Volver</a>
+      <a href="/admin/logout" class="text-xs text-gray-400 hover:text-red-500 transition-colors">
+        Cerrar sesión
+      </a>
+    </div>
+    <h1 class="text-2xl font-bold mb-6">{title}</h1>
+    <slot />
+  </div>
+</Layout>

@@ -1,0 +1,173 @@
+La identidad visual ya existe y debe respetarse.
+
+### Colores de marca
+
+Primario:
+- #17877F (turquesa)
+
+Secundario:
+- #FF8E00 (naranja)
+
+Apoyo:
+- #0F4C81 (azul profundo)
+
+Neutros:
+- #FFFFFF
+- #F5F5F5
+- #E5E7EB
+- #6B7280
+- #000000
+
+## Objetivo
+
+La plataforma funciona como un catálogo digital donde pequeños emprendedores publican productos y los clientes realizan pedidos principalmente mediante WhatsApp.
+
+Debe transmitir:
+
+- confianza
+- rapidez
+- facilidad de compra
+- cercanía
+- modernidad
+- simplicidad
+
+No debe parecer una tienda tradicional tipo Amazon, sino un catálogo moderno y muy fácil de usar.
+
+## Estilo visual
+
+Minimalista.
+Mucho espacio en blanco.
+en las card de producto hover de zoom
+Bordes redondeados (16px).
+Sombras muy suaves.
+Animaciones discretas.
+Diseño mobile-first.
+Iconografía moderna.
+Tarjetas limpias.
+Sin exceso de colores.
+
+## Uso de colores
+
+60% blanco
+
+25% turquesa
+
+10% naranja
+
+5% azul
+
+El naranja únicamente debe utilizarse para:
+
+- precios
+- descuentos
+- promociones
+- botones principales
+- indicadores importantes
+
+El turquesa será el color principal de navegación:
+
+- Header
+- Categorías
+- Botones secundarios
+- Iconos
+- Links activos
+
+El azul únicamente para:
+
+- Footer
+- Estadísticas
+- Información institucional
+- Badges premium
+
+Nunca usar fondos completamente negros.
+
+## Tipografía
+
+Fuente estilo:
+
+Poppins o Inter
+
+Pesos:
+
+400
+
+500
+
+600
+
+700
+
+Mucho contraste.
+
+## Componentes
+
+Header fijo.
+
+Logo a la izquierda.
+
+Buscador grande.
+
+Botón publicar catálogo.
+
+Menú de categorías horizontal.
+
+Banner principal con promociones.
+
+Grid de productos.
+
+Cada tarjeta debe incluir:
+
+- fotografía
+- nombre
+- precio muy destacado en naranja
+
+Footer limpio.
+
+## Botones
+
+Botón principal
+
+Fondo:
+#17877F
+
+Hover:
+Oscurecer un 10%.
+
+Texto blanco.
+
+Botón Enviar Pedido por WhatsApp
+
+Fondo:
+#FF8E00
+
+Hover:
+Oscurecer ligeramente.
+
+Nunca utilizar botones negros.
+
+## Tarjetas
+
+Fondo blanco.
+
+Borde:
+#E5E7EB
+
+Sombra ligera.
+
+Hover con elevación.
+
+## Experiencia
+
+Debe sentirse como una mezcla entre:
+
+- Shopify
+- Mercado Libre
+- WhatsApp Business
+- Apple
+
+Con mucho espacio, imágenes grandes y navegación muy intuitiva.
+5 imagenes por fila en pantalla grandes
+
+La prioridad es que el usuario encuentre un producto y lo pueda pedir en menos de 3 clics.
+
+El diseño debe ser completamente responsive y optimizado para móviles, ya que la mayoría de los usuarios accederán desde WhatsApp.

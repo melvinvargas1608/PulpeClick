@@ -1,0 +1,170 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { supabaseAdmin } from '../../lib/supabase.ts';
+import DeleteProductButton from '../../components/DeleteProductButton';
+
+interface Product {
+  id: string;
+  name: string;
+  image_url: string | null;
+  price: number | null;
+  categories: { name: string } | null;
+}
+
+const url = new URL(Astro.request.url);
+const sellerSlug = url.searchParams.get('seller');
+
+if (!sellerSlug) {
+  return Astro.redirect('/admin');
+}
+
+// Fetch seller
+const { data: seller } = await supabaseAdmin
+  .from('sellers')
+  .select('id, name, slug')
+  .eq('slug', sellerSlug)
+  .single();
+
+if (!seller) {
+  return Astro.redirect('/admin');
+}
+
+// Fetch products with categories
+const { data: products } = await supabaseAdmin
+  .from('products')
+  .select('*, categories(name)')
+  .eq('seller_id', seller.id)
+  .order('created_at', { ascending: false });
+---
+
+<AdminLayout title={`Productos de ${seller.name}`} backHref="/admin/vendedores" maxWidth="max-w-4xl">
+  <div class="flex justify-end mb-6">
+    <a
+      href={`/admin/nuevo-producto?client=${seller.slug}`}
+      class="inline-flex items-center gap-1.5 bg-brand text-white text-sm font-semibold py-2.5 px-4 rounded-xl hover:bg-brand-dark transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+      Agregar producto
+    </a>
+  </div>
+
+  {!products || products.length === 0 ? (
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+      <p class="text-yellow-800 text-sm mb-4">Este vendedor no tiene productos aún</p>
+      <a
+        href={`/admin/nuevo-producto?client=${seller.slug}`}
+        class="inline-block bg-brand text-white text-sm font-semibold py-2 px-4 rounded-xl hover:bg-brand-dark transition-colors"
+      >
+        Agregar primer producto
+      </a>
+    </div>
+  ) : (
+    <>
+      {/* Mobile: cards */}
+      <div class="block sm:hidden space-y-3">
+        {products.map((product: Product) => (
+          <div class="bg-white border border-gray-200 rounded-xl p-4">
+            <div class="flex gap-3">
+              {product.image_url ? (
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  class="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                />
+              ) : (
+                <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                </div>
+              )}
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 truncate">{product.name}</h3>
+                {product.categories?.name && (
+                  <span class="inline-block bg-brand-light text-brand text-xs px-2 py-0.5 rounded-full mt-1">
+                    {product.categories.name}
+                  </span>
+                )}
+                {product.price != null && (
+                  <p class="text-lg font-bold text-hot mt-1">L {product.price.toFixed(2)}</p>
+                )}
+              </div>
+            </div>
+            <div class="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+              <a
+                href={`/admin/editar-producto?id=${product.id}`}
+                class="text-gray-400 hover:text-brand p-1 transition-colors"
+                title="Editar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </a>
+              <DeleteProductButton productId={product.id} productName={product.name} client:load />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: table */}
+      <div class="hidden sm:block bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50">
+              <th class="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Producto</th>
+              <th class="text-left text-xs font-semibold text-gray-500 uppercase px-4 py-3">Categoría</th>
+              <th class="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-3">Precio</th>
+              <th class="text-right text-xs font-semibold text-gray-500 uppercase px-4 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product: Product) => (
+              <tr class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        class="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                      </div>
+                    )}
+                    <span class="font-medium text-gray-900 text-sm">{product.name}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  {product.categories?.name ? (
+                    <span class="inline-block bg-brand-light text-brand text-xs px-2 py-0.5 rounded-full">
+                      {product.categories.name}
+                    </span>
+                  ) : (
+                    <span class="text-xs text-gray-400">&mdash;</span>
+                  )}
+                </td>
+                <td class="px-4 py-3 text-right">
+                  {product.price != null ? (
+                    <span class="font-semibold text-hot text-sm">L {product.price.toFixed(2)}</span>
+                  ) : (
+                    <span class="text-xs text-gray-400">&mdash;</span>
+                  )}
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <a
+                      href={`/admin/editar-producto?id=${product.id}`}
+                      class="text-gray-400 hover:text-brand p-1.5 transition-colors"
+                      title="Editar"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </a>
+                    <DeleteProductButton productId={product.id} productName={product.name} client:load />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+</AdminLayout>

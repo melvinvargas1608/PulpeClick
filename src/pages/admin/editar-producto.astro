@@ -1,0 +1,11 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ProductForm from '../../components/ProductForm';
+
+const url = new URL(Astro.request.url);
+const editId = url.searchParams.get('id') || undefined;
+---
+
+<AdminLayout title="Editar Producto">
+  <ProductForm editId={editId} client:load />
+</AdminLayout>

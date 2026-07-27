@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SellerList from '../../components/SellerList';
+---
+
+<AdminLayout title="Vendedores Registrados" maxWidth="max-w-6xl">
+  <SellerList client:load />
+</AdminLayout>
