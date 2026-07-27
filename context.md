@@ -15,13 +15,66 @@ Servicio de **catálogos digitales con IA** para emprendedores de Honduras que v
 | Componente | Tecnología |
 |---|---|
 | Framework | Astro (SSR) + React 19 + TypeScript |
-| Estilos | Tailwind CSS v4 (mobile-first) |
+| Estilos | Tailwind CSS v4 (mobile-first) con design tokens de marca |
+| Tipografía | Inter (Google Fonts) — pesos 400, 500, 600, 700 |
 | Base de datos | Supabase (PostgreSQL) con tipos generados |
 | Almacenamiento | Supabase Storage (bucket `products`) |
 | Autenticación admin | Cookie `admin_auth` + PIN en .env |
 | IA | Gemini API (`gemini-3.5-flash-lite`) |
-| Hosting | Vercel |
-| Package manager | pnpm 11.1.1 |
+| Hosting | Vercel (adapter `@astrojs/vercel`) |
+| Package manager | npm (lock file) |
+
+## Design Tokens (marca)
+
+Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
+
+| Token | Color | Uso |
+|---|---|---|
+| `brand` | `#17877F` turquesa | Navegación, header, categorías, iconos, botones secundarios |
+| `brand-dark` | `#136B65` | Hover de brand |
+| `brand-light` | `#E8F5F4` | Fondos sutiles, badges |
+| `hot` | `#FF8E00` naranja | Precios, promociones, CTA, WhatsApp |
+| `hot-dark` | `#E67E00` | Hover de hot |
+| `hot-light` | `#FFF3E0` | Fondos de promociones |
+| `deep` | `#0F4C81` azul | Footer, badges premium, estadísticas |
+| `deep-dark` | `#0B3D66` | Hover de deep |
+| `deep-light` | `#E8EFF6` | Fondos institucionales |
+
+**Reglas de marca** (de `marca.txt`):
+- 60% blanco / 25% turquesa / 10% naranja / 5% azul
+- Naranja SOLO para: precios, descuentos, promociones, botones CTA, indicadores
+- Turquesa: header, categorías, botones secundarios, iconos, links
+- Azul SOLO para: footer, estadísticas, badges premium
+- NUNCA fondos negros ni botones negros
+- Bordes redondeados 16px, sombras muy suaves, animaciones discretas
+- Mobile-first, menos de 3 clics para pedir
+
+## Componentes UI base
+
+| Componente | Archivo | Variantes |
+|---|---|---|
+| `Button` | `src/components/ui/Button.tsx` | `primary`, `cta`, `secondary`, `ghost`, `whatsapp` |
+| `Card` | `src/components/ui/Card.tsx` | Hover con elevación, opcionalmente clickeable |
+| `Price` | `src/components/ui/Price.tsx` | `sm`, `md`, `lg`, `xl` — siempre color `hot` |
+| `Badge` | `src/components/ui/Badge.tsx` | `category`, `premium`, `promo`, `info`, `success`, `warning` |
+| `Switch` | `src/components/ui/Switch.tsx` | Toggle con animación |
+| `ConfirmDialog` | `src/components/ui/ConfirmDialog.tsx` | Modal de confirmación (`danger`/`default`) |
+| `Spinner` | `src/components/ui/Spinner.tsx` | `sm`, `md`, `lg` |
+| `Alert` | `src/components/ui/Alert.tsx` | `error`, `warning`, `success` |
+| `EmptyState` | `src/components/ui/EmptyState.tsx` | Mensaje + acción opcional |
+
+## Logos
+
+| Ubicación | Archivo | Tamaño |
+|---|---|---|
+| Navbar catálogo | `/logo-512.png` | `h-12` (48px), link a home |
+| Landing page | `/logo-512.png` | `h-24` (96px) |
+| Footer | `/logo-blanco-512.png` | `h-12` (48px), sobre fondo `deep` |
+| Favicon SVG | `/favicon.svg` | Link en `<head>` |
+| Favicon ICO | `/favicon.ico` | Fallback |
+| Apple touch | `/apple-touch-icon.png` | iOS |
+| PWA 192 | `/icon-192.png` | Android |
+| PWA 512 | `/icon-512.png` | Splash |
 
 ## Base de datos (Supabase)
 
@@ -83,12 +136,12 @@ Servicio de **catálogos digitales con IA** para emprendedores de Honduras que v
 ### Catálogo Público (`/catalogo/[slug]`)
 
 - SSR: fetch seller + products + categorías del vendedor
-- **Navbar**: logo "PulpeClick" + CatalogFilters (dropdown categorías + buscador) + CartButton
+- **Navbar**: logo PulpeClick (`h-12`, link a home) + CatalogFilters (dropdown categorías + buscador) + CartButton
 - Filtros combinados: categoría + nombre. "Limpiar filtros" + contador de resultados
 - Header tipo perfil: nombre del vendedor + "Catálogo de productos"
-- Grid responsive: 1/2/4 columnas, images 1:1 con object-cover
+- Grid responsive: 1/2/4 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card)
 - CartQuantityButton por producto
-- Botón flotante WhatsApp (abajo derecha) para contactar al vendedor
+- Botón flotante WhatsApp (`bg-hot`, abajo derecha) para contactar al vendedor
 - Footer: "Catálogo creado con PulpeClick"
 
 ### Carrito y Pedidos
@@ -118,9 +171,15 @@ Servicio de **catálogos digitales con IA** para emprendedores de Honduras que v
 src/
 ├── components/
 │   ├── ui/                    # Componentes compartidos
-│   │   ├── Spinner.tsx        # Spinner de carga (sm/md/lg)
-│   │   ├── Alert.tsx          # Alertas (error/warning/success)
-│   │   └── EmptyState.tsx     # Estado vacío con CTA opcional
+│   │   ├── Alert.tsx           # Alertas (error/warning/success)
+│   │   ├── Badge.tsx           # Badges (category/premium/promo/info/success/warning)
+│   │   ├── Button.tsx          # Botón (primary/cta/secondary/ghost/whatsapp)
+│   │   ├── Card.tsx            # Tarjeta con sombra y hover
+│   │   ├── ConfirmDialog.tsx   # Modal de confirmación (danger/default)
+│   │   ├── EmptyState.tsx      # Estado vacío con CTA opcional
+│   │   ├── Price.tsx           # Precio formateado en color hot
+│   │   ├── Spinner.tsx         # Spinner de carga (sm/md/lg)
+│   │   └── Switch.tsx          # Toggle con animación
 │   ├── CartButton.tsx         # Botón carrito con badge
 │   ├── CartDrawer.tsx         # Panel lateral + checkout (usa useCheckout)
 │   ├── CartNavbar.tsx         # Navbar: logo + CatalogFilters + CartButton
@@ -152,8 +211,9 @@ src/
 ├── types/
 │   └── database.ts            # Tipos Database de Supabase (6 tablas)
 ├── pages/
+│   ├── 404.astro              # Página 404 custom con logo de PulpeClick
 │   ├── catalogo/[slug].astro  # Catálogo público (SSR)
-│   ├── index.astro            # Landing page
+│   ├── index.astro            # Landing page con logo grande
 │   ├── admin/
 │   │   ├── index.astro, login.astro, logout.astro
 │   │   ├── vendedores.astro, nuevo-vendedor.astro
@@ -208,34 +268,40 @@ pnpm run build        # Build para producción
 18. **ConfirmDialog**: Modal de confirmación reutilizable (eliminar producto, eliminar categoría). Reemplaza `window.confirm()` en todos lados. Responsive, cierra al hacer clic fuera, loading state.
 19. **Íconos consistentes**: Lápiz SVG (no emoji ✏️) para editar, basurero SVG para eliminar. Mismos íconos en categorías, productos y vendedores.
 20. **PIN seguro**: `lib/pin.ts` con `isValidPin()`. Requisitos: >8 caracteres, 1 mayúscula, 1 número, 1 carácter especial. Login ya no fuerza solo números. Default: `Admin123!`.
+21. **Design tokens Tailwind v4**: `@theme` en CSS genera utilidades como `bg-brand`, `text-hot`, `shadow-card` automáticamente. No requiere `tailwind.config.js`.
+22. **Google Fonts + Tailwind v4**: `@import url()` en CSS con `@theme` genera warning. Mejor cargar la fuente con `<link>` en el `<head>` HTML.
+23. **Adapter Vercel**: `@astrojs/node` (standalone) NO funciona en Vercel serverless. Usar `@astrojs/vercel` para deploy en Vercel.
+24. **Vercel + repo privado**: El plan Hobby bloquea deploys desde repos privados con colaboradores. Solución: hacer el repo público.
+25. **Vercel + variables de entorno**: Faltan variables → build falla con ❌ en GitHub. Configurarlas en Vercel Dashboard → Settings → Environment Variables.
+26. **Zoom solo en imagen**: Usar `group` en contenedor + `group-hover:scale-105` en `<img>`. No aplicar zoom a toda la card. `overflow-hidden` en el contenedor recorta el excedente.
+27. **Favicons anti-cache**: Agregar `?v=2` a los href de favicons para forzar recarga en navegadores que cachearon un favicon anterior (ej. el de Vercel).
+28. **PWA manifest**: `theme_color` en `site.webmanifest` debe coincidir con el color de marca (`#17877f`).
 
 ## Próximos pasos
 
-- Deploy a Vercel con el nombre "PulpeClick"
-- Ejecutar migraciones 004, 005, 007 en Supabase
-- Agregar logo real de PulpeClick (reemplazar texto)
+- ✅ Deploy a Vercel — `https://pulpe-click.vercel.app`
+- ✅ Agregar logo real de PulpeClick (navbar, footer, landing, favicon)
+- ✅ Implementar design tokens de marca (brand/hot/deep)
+- ✅ Migrar todos los componentes a tokens de marca (~100 ocurrencias)
+- ✅ Crear componentes UI base (Button, Card, Price, Badge, Switch, ConfirmDialog)
+- ✅ Página 404 custom con logo
+- ✅ Efecto zoom en imágenes del catálogo (scale-105)
+- ✅ Configurar PWA manifest + favicons
 - Probar con vendedores reales
-- Posible mejora: eliminación de fondo online + compresión
 
-## Assets visuales requeridos
+## Assets visuales
 
 | Asset | Tamaño | Formato | Uso |
 |---|---|---|---|
-| `favicon.svg` | 128×128 viewBox | SVG | Favicon principal, adaptativo |
-| `favicon.ico` | 32×32 (con 16×16) | ICO | Fallback navegadores antiguos |
+| `favicon.svg` | SVG | SVG | Favicon principal |
+| `favicon.ico` | 32×32 | ICO | Fallback navegadores antiguos |
 | `apple-touch-icon.png` | 180×180 | PNG | iOS / Safari |
 | `icon-192.png` | 192×192 | PNG | PWA Android |
 | `icon-512.png` | 512×512 | PNG | PWA splash screen |
-| `logo.svg` | altura 40px | SVG | Navbar, footer |
-| `logo-dark.svg` | altura 40px | SVG | Dark mode |
-| `logo-512.png` | 512×512 | PNG | Fallback + OG |
-| `og-image.png` | 1200×630 | PNG | WhatsApp / Facebook / LinkedIn |
-| `twitter-image.png` | 1200×675 | PNG | Twitter / X |
-| Productos (original) | 1200×1200 (1:1) | JPG/WEBP | Subida por vendedor |
-| Productos (optimizada) | 600×600 | WEBP | Catálogo |
-| WhatsApp card | 1080×1080 | PNG | PostImageGenerator |
+| `logo-512.png` | 512×512 | PNG | Navbar (`h-12`), landing (`h-24`) |
+| `logo-blanco-512.png` | 512×512 | PNG | Footer sobre fondo `deep` (`h-12`) |
+| `logo-negro-512.png` | 512×512 | PNG | Uso futuro (fondos claros) |
+| `site.webmanifest` | — | JSON | PWA config (`theme_color: #17877f`) |
 
-### Notas
-- `favicon.ico` y `favicon.svg` existen en `public/` pero **no están linkeados en `Layout.astro`**.
-- El SVG actual es el favicon por defecto de Astro, debe reemplazarse por el logo de PulpeClick.
+Todos los assets están en `public/` y linkeados en `Layout.astro`.
 - Las imágenes de producto deben ser **1:1 (cuadradas)** para funcionar con `aspect-square` + `object-cover` en las cards.
