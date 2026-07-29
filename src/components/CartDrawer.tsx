@@ -90,7 +90,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
           ) : (
             <>
               {/* Product list */}
-              <div className="divide-y divide-gray-100 bg-red-600">
+              <div className="divide-y divide-gray-100">
                 {items.map((item) => (
                   <div key={item.productId} className="flex gap-3 p-4">
                     {/* Image */}
