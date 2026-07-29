@@ -236,7 +236,7 @@ export default function ProductEditForm({ editId }: Props) {
             <button
               type="submit"
               disabled={saving}
-              className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+              className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
             >
               {saving ? 'Guardando...' : 'Guardar cambios'}
             </button>
@@ -245,7 +245,7 @@ export default function ProductEditForm({ editId }: Props) {
               type="button"
               onClick={() => setShowDeleteDialog(true)}
               disabled={deleting}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
             >
               {deleting ? 'Eliminando...' : 'Eliminar producto'}
             </button>

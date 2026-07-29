@@ -163,7 +163,7 @@ export default function SellerForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+        className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
       >
         {loading ? 'Guardando...' : editId ? 'Actualizar Vendedor' : 'Registrar Vendedor'}
       </button>

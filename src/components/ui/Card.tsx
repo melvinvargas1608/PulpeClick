@@ -19,7 +19,7 @@ export default function Card({
     <Component
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`bg-white border border-gray-200 rounded-card shadow-card
+      className={`bg-red-600 border border-gray-200 rounded-card shadow-card
         ${hover ? 'transition-shadow duration-200 hover:shadow-card-hover' : ''}
         ${onClick ? 'cursor-pointer text-left w-full' : ''}
         ${className}`}

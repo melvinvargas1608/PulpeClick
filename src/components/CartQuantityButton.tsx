@@ -23,7 +23,7 @@ export default function CartQuantityButton({ productId, productName, price, imag
         >
           −
         </button>
-        <span className="text-white text-sm font-semibold min-w-[1.5rem] text-center">
+        <span className="text-white text-sm font-semibold min-w-6 text-center">
           {cartItem.quantity}
         </span>
         <button

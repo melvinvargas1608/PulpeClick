@@ -25,7 +25,7 @@ export default function CatalogFilters({
       <select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="h-10 px-3 py-2 border border-gray-300 rounded-l-lg text-sm bg-gray-50 text-gray-700 focus:ring-2 focus:ring-brand focus:border-brand outline-none shrink-0 max-w-[100px] sm:max-w-[130px] truncate"
+        className="h-10 px-3 py-2 border border-gray-300 rounded-l-lg text-sm bg-gray-50 text-gray-700 focus:ring-2 focus:ring-brand focus:border-brand outline-none shrink-0 max-w-25 sm:max-w-32.5 truncate"
         aria-label="Filtrar por categoría"
       >
         <option value="">Todas</option>

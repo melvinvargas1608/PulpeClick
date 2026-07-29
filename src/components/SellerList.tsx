@@ -137,19 +137,19 @@ export default function SellerList() {
                 href={`/catalogo/${seller.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-center text-sm font-medium text-brand hover:text-brand-dark py-2 min-h-[2.75rem] flex items-center justify-center rounded-lg hover:bg-brand-light transition-colors"
+                className="flex-1 text-center text-sm font-medium text-brand hover:text-brand-dark py-2 min-h-11 flex items-center justify-center rounded-lg hover:bg-brand-light transition-colors"
               >
                 Ver catálogo
               </a>
               <a
                 href={`/admin/nuevo-producto?client=${seller.slug}`}
-                className="flex-1 text-center text-sm font-medium bg-brand text-white py-2 px-3 rounded-lg hover:bg-brand-dark transition-colors min-h-[2.75rem] flex items-center justify-center"
+                className="flex-1 text-center text-sm font-medium bg-brand text-white py-2 px-3 rounded-lg hover:bg-brand-dark transition-colors min-h-11 flex items-center justify-center"
               >
                 + Producto
               </a>
               <a
                 href={`/admin/nuevo-vendedor?id=${seller.id}`}
-                className="text-sm text-gray-400 hover:text-gray-600 py-2 px-2 min-h-[2.75rem] flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
+                className="text-sm text-gray-400 hover:text-gray-600 py-2 px-2 min-h-11 flex items-center justify-center rounded-lg hover:bg-gray-50 transition-colors"
                 title="Editar"
               >
                 <EditIcon size={14} />

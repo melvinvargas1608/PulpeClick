@@ -68,7 +68,7 @@ export default function SelectSeller() {
           href={`/admin/nuevo-producto?client=${seller.slug}`}
           className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-brand/40 transition-all"
         >
-          <div className="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center text-brand font-bold text-sm flex-shrink-0">
+          <div className="w-10 h-10 bg-brand-light rounded-full flex items-center justify-center text-brand font-bold text-sm shrink-0">
             {seller.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -77,7 +77,7 @@ export default function SelectSeller() {
               <p className="text-xs text-gray-500">{seller.phone}</p>
             )}
           </div>
-          <span className="text-brand/60 text-lg flex-shrink-0">→</span>
+          <span className="text-brand/60 text-lg shrink-0">→</span>
         </a>
       ))}
     </div>

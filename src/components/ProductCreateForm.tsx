@@ -275,7 +275,7 @@ export default function ProductCreateForm() {
           <button
             type="submit"
             disabled={generating}
-            className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+            className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
           >
             {generating ? 'Generando...' : 'Generar Contenido con IA ✨'}
           </button>
@@ -388,7 +388,7 @@ export default function ProductCreateForm() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+                className="w-full bg-brand hover:bg-brand-dark disabled:bg-brand-light text-white font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
               >
                 {saving ? 'Guardando...' : '💾 Guardar Producto'}
               </button>
@@ -400,7 +400,7 @@ export default function ProductCreateForm() {
                   setGenError('');
                 }}
                 disabled={saving}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors min-h-[2.75rem]"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-colors min-h-11"
               >
                 ← Volver y editar
               </button>
