@@ -90,11 +90,11 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
           ) : (
             <>
               {/* Product list */}
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 bg-red-600">
                 {items.map((item) => (
                   <div key={item.productId} className="flex gap-3 p-4">
                     {/* Image */}
-                    <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100">
                       {item.imageUrl ? (
                         <img
                           src={item.imageUrl}
@@ -133,7 +133,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
                           >
                             −
                           </button>
-                          <span className="text-gray-900 text-sm font-medium min-w-[1.5rem] text-center">
+                          <span className="text-gray-900 text-sm font-medium min-w-6 text-center">
                             {item.quantity}
                           </span>
                           <button

@@ -33,7 +33,7 @@ export default function Switch({ checked, onChange, disabled, label, id }: Switc
           className={`
             inline-block h-4 w-4 transform rounded-full bg-white shadow-sm
             transition-transform duration-200 ease-in-out
-            ${checked ? 'translate-x-[1.125rem]' : 'translate-x-0.5'}
+            ${checked ? 'translate-x-4.5' : 'translate-x-0.5'}
           `}
         />
       </button>
