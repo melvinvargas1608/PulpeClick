@@ -8,33 +8,18 @@ interface Props {
 }
 
 export default function CartQuantityButton({ productId, productName, price, imageUrl }: Props) {
-  const { items, addItem, updateQuantity } = useCart();
+  const { items, addItem } = useCart();
   const cartItem = items.find((i) => i.productId === productId);
   const inCart = cartItem && cartItem.quantity > 0;
 
-  if (inCart && cartItem) {
+  if (inCart) {
     return (
-      <div className="flex items-center gap-1 bg-brand rounded-lg overflow-hidden">
-        <button
-          type="button"
-          onClick={() => updateQuantity(productId, cartItem.quantity - 1)}
-          className="text-white hover:bg-brand-dark px-2 py-1.5 text-sm font-bold transition-colors"
-          aria-label={`Reducir cantidad de ${productName}`}
-        >
-          −
-        </button>
-        <span className="text-white text-sm font-semibold min-w-6 text-center">
-          {cartItem.quantity}
-        </span>
-        <button
-          type="button"
-          onClick={() => updateQuantity(productId, cartItem.quantity + 1)}
-          className="text-white hover:bg-brand-dark px-2 py-1.5 text-sm font-bold transition-colors"
-          aria-label={`Aumentar cantidad de ${productName}`}
-        >
-          +
-        </button>
-      </div>
+      <span className="inline-flex items-center gap-1 bg-brand-light text-brand text-xs font-semibold px-2.5 py-1.5 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        En carrito
+      </span>
     );
   }
 
