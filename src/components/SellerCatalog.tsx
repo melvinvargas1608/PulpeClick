@@ -5,6 +5,7 @@ import CartDrawer from './CartDrawer';
 import CartQuantityButton from './CartQuantityButton';
 import WhatsAppIcon from './icons/WhatsAppIcon';
 import { formatPrice } from '../lib/format';
+import { getCurrencySymbol } from '../lib/countryFlags';
 
 interface Product {
   id: string;
@@ -43,6 +44,8 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   });
 
   const hasActiveFilters = selectedCategory !== '' || searchQuery !== '';
+
+  const currency = getCurrencySymbol(country);
 
   const whatsappMessage = '¡Hola! Vi tu catálogo en PulpeClick. Quiero hacer una consulta.';
 
@@ -135,7 +138,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
                   </div>
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                     <span className="text-xl font-bold text-hot">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.price, currency)}
                     </span>
                     <CartQuantityButton
                       productId={product.id}
@@ -182,6 +185,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         sellerId={sellerId}
         sellerName={sellerName}
         whatsappUrl={whatsappUrl}
+        currency={currency}
       />
     </>
   );

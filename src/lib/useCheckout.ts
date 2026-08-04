@@ -8,6 +8,7 @@ interface UseCheckoutProps {
   sellerId: string;
   sellerName: string;
   whatsappUrl: string;
+  currency: string;
   clearCart: () => void;
   onClose: () => void;
 }
@@ -21,7 +22,7 @@ interface CheckoutState {
 }
 
 export function useCheckout(props: UseCheckoutProps) {
-  const { items, totalAmount, sellerId, sellerName, whatsappUrl, clearCart, onClose } = props;
+  const { items, totalAmount, sellerId, sellerName, whatsappUrl, currency, clearCart, onClose } = props;
 
   const [state, setState] = useState<CheckoutState>({
     name: '',
@@ -89,12 +90,12 @@ export function useCheckout(props: UseCheckoutProps) {
 
       // Build WhatsApp message
       const itemsList = items
-        .map((item) => `• ${item.productName} x${item.quantity} — L ${(item.price * item.quantity).toFixed(2)}`)
+        .map((item) => `• ${item.productName} x${item.quantity} — ${currency} ${(item.price * item.quantity).toFixed(2)}`)
         .join('\n');
 
       const message = `¡Hola! Soy *${state.name.trim()}*. Quiero hacer este pedido:\n\n` +
         `*Mi pedido:*\n${itemsList}\n\n` +
-        `*Total: L ${totalAmount.toFixed(2)}*\n\n` +
+        `*Total: ${currency} ${totalAmount.toFixed(2)}*\n\n` +
         `Mi teléfono: ${state.phone.trim()}`;
 
       window.open(`${whatsappUrl}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');

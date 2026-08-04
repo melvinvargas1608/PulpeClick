@@ -11,9 +11,10 @@ interface Props {
   sellerId: string;
   sellerName: string;
   whatsappUrl: string;
+  currency: string;
 }
 
-export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, whatsappUrl }: Props) {
+export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, whatsappUrl, currency }: Props) {
   const { items, removeItem, updateQuantity, itemCount, totalAmount, clearCart } = useCart();
 
   const { name, phone, errors, loading, submitError, setName, setPhone, handleSubmit } = useCheckout({
@@ -22,6 +23,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
     sellerId,
     sellerName,
     whatsappUrl,
+    currency,
     clearCart,
     onClose,
   });
@@ -119,7 +121,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
                         {item.productName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        L {item.price.toFixed(2)} c/u
+                        {currency} {item.price.toFixed(2)} c/u
                       </p>
 
                       <div className="flex items-center justify-between mt-2">
@@ -153,7 +155,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
 
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-gray-900">
-                            L {(item.price * item.quantity).toFixed(2)}
+                            {currency} {(item.price * item.quantity).toFixed(2)}
                           </span>
                           <button
                             type="button"
@@ -178,7 +180,7 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Total</span>
                   <span className="text-xl font-bold text-gray-900">
-                    L {totalAmount.toFixed(2)}
+                    {currency} {totalAmount.toFixed(2)}
                   </span>
                 </div>
               </div>

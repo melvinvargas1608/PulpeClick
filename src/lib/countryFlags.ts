@@ -14,6 +14,23 @@ const FLAG_MAP: Record<string, string> = {
 };
 
 /**
+ * Mapa de países a símbolos de moneda.
+ */
+const CURRENCY_MAP: Record<string, string> = {
+  Honduras: 'L',
+  Guatemala: 'Q',
+  'El Salvador': '$',
+  'Costa Rica': '₡',
+  Nicaragua: 'C$',
+  Panamá: 'B/.',
+  México: '$',
+  Colombia: '$',
+};
+
+/** Moneda por defecto si el país no está en el mapa. */
+const DEFAULT_CURRENCY = 'L';
+
+/**
  * Lista de países para el dropdown del formulario.
  * Orden: Centroamérica, México, Colombia, Otro.
  */
@@ -44,4 +61,11 @@ export function getCountryFlag(country: string): string {
 export function formatCountryWithFlag(country: string): string {
   const flag = getCountryFlag(country);
   return flag ? `${flag} ${country}` : country;
+}
+
+/**
+ * Devuelve el símbolo de moneda para un país, o L (Lempira) por defecto.
+ */
+export function getCurrencySymbol(country: string): string {
+  return CURRENCY_MAP[country] ?? DEFAULT_CURRENCY;
 }
