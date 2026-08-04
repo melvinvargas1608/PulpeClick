@@ -128,7 +128,12 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
                           <button
                             type="button"
                             onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                            className="text-gray-600 hover:bg-gray-200 px-2 py-0.5 text-sm font-bold transition-colors"
+                            disabled={item.quantity <= 1}
+                            className={`px-2 py-0.5 text-sm font-bold transition-colors ${
+                              item.quantity <= 1
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-600 hover:bg-gray-200'
+                            }`}
                             aria-label={`Reducir cantidad de ${item.productName}`}
                           >
                             −
