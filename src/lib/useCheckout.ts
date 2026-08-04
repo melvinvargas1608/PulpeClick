@@ -42,7 +42,7 @@ export function useCheckout(props: UseCheckoutProps) {
     }
 
     if (!validatePhone(state.phone)) {
-      newErrors.phone = 'Ingresá un número de teléfono válido (mínimo 8 dígitos)';
+      newErrors.phone = 'Ingresá un número válido (si estás fuera de Honduras incluí el código de país, ej: +503)';
     }
 
     setState(s => ({ ...s, errors: newErrors }));
@@ -95,7 +95,7 @@ export function useCheckout(props: UseCheckoutProps) {
       const message = `¡Hola! Soy *${state.name.trim()}*. Quiero hacer este pedido:\n\n` +
         `*Mi pedido:*\n${itemsList}\n\n` +
         `*Total: L ${totalAmount.toFixed(2)}*\n\n` +
-        `Mi telefono: ${cleanPhone}`;
+        `Mi teléfono: ${state.phone.trim()}`;
 
       window.open(`${whatsappUrl}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
       clearCart();

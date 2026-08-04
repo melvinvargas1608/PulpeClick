@@ -160,6 +160,9 @@ export default function SellerForm() {
           className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none"
           placeholder="+504 1234-5678"
         />
+        <p className="text-xs text-gray-400 mt-1">
+          Incluí el código de país si estás fuera de Honduras (ej: +503, +506)
+        </p>
         {phone && (
           <p className="text-xs text-gray-400 mt-1">
             WhatsApp: {buildWhatsAppUrl(phone)}

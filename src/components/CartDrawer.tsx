@@ -215,13 +215,13 @@ export default function CartDrawer({ isOpen, onClose, sellerId, sellerName, what
                     className={`w-full px-3 py-3 border rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none ${
                       errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300'
                     }`}
-                    placeholder="Ej: 9999-9999"
+                    placeholder="+504 9999-9999"
                     disabled={loading}
                     autoComplete="tel"
                   />
-                  {phone && phone.replace(/\D/g, '').length > 0 && (
+                  {phone && phone.replace(/\D|^\+/g, '').length > 0 && (
                     <p className="text-gray-400 text-xs mt-1">
-                      Se enviará como: {phone.replace(/\D/g, '')}
+                      Se enviará como: {phone.trim()}
                     </p>
                   )}
                   {errors.phone && (
