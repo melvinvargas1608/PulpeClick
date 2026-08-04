@@ -58,21 +58,23 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, pr
 
       <div className="max-w-7xl mx-auto px-2 py-6">
         {/* Banner de la tienda */}
-        <div className="relative rounded-2xl overflow-hidden mb-6 h-48 sm:h-64">
-          {bannerUrl ? (
+        {bannerUrl ? (
+          <div className="rounded-2xl overflow-hidden mb-6 h-48 sm:h-64">
             <img
               src={bannerUrl}
-              alt={`Banner de ${sellerName}`}
-              className="absolute inset-0 w-full h-full object-cover"
+              alt={sellerName}
+              className="w-full h-full object-cover"
             />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-brand to-brand-dark" />
-          )}
-          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white px-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-center">{sellerName}</h1>
-            <p className="text-sm text-white/80 mt-1">Catálogo de productos</p>
           </div>
-        </div>
+        ) : (
+          <div className="relative rounded-2xl overflow-hidden mb-6 h-48 sm:h-64">
+            <div className="absolute inset-0 bg-gradient-to-r from-brand to-brand-dark" />
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white px-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-center">{sellerName}</h1>
+              <p className="text-sm text-white/80 mt-1">Catálogo de productos</p>
+            </div>
+          </div>
+        )}
 
         {/* Resultados de búsqueda */}
         {hasActiveFilters && (
