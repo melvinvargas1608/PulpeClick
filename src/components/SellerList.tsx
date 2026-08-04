@@ -129,8 +129,8 @@ export default function SellerList() {
               <h3 className={`font-semibold truncate ${seller.is_active ? 'text-gray-900' : 'text-gray-400'}`}>
                 {seller.name}
               </h3>
-              <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${seller.is_active ? 'text-gray-500' : 'text-gray-400'}`}>
-                {getCountryFlag(seller.country)}{seller.country}
+              <span className={`inline-flex items-center text-sm mt-0.5 ${seller.is_active ? 'text-gray-500' : 'text-gray-400'}`} title={seller.country}>
+                {getCountryFlag(seller.country)}
               </span>
               {seller.phone && (
                 <p className={`text-sm mt-0.5 ${seller.is_active ? 'text-gray-500' : 'text-gray-400'}`}>{seller.phone}</p>
