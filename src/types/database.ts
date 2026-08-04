@@ -17,6 +17,7 @@ export interface Database {
           whatsapp_url: string | null
           slug: string
           banner_url: string | null
+          country: string
           is_active: boolean
           created_at: string
           updated_at: string
@@ -28,6 +29,7 @@ export interface Database {
           whatsapp_url?: string | null
           slug: string
           banner_url?: string | null
+          country?: string
           is_active?: boolean
           created_at?: string
           updated_at?: string
@@ -39,6 +41,7 @@ export interface Database {
           whatsapp_url?: string | null
           slug?: string
           banner_url?: string | null
+          country?: string
           is_active?: boolean
           created_at?: string
           updated_at?: string

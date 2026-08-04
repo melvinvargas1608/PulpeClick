@@ -3,6 +3,7 @@ import { supabaseClient } from '../lib/supabase-client'
 import { generateSlug } from '../lib/slug'
 import { buildWhatsAppUrl, sanitizePhoneInput } from '../lib/phone'
 import { uploadBannerImage, deleteBannerImage } from '../lib/storage'
+import { COUNTRY_OPTIONS } from '../lib/countryFlags'
 import BannerUploader from './BannerUploader'
 import Spinner from './ui/Spinner'
 import Alert from './ui/Alert'
@@ -18,6 +19,8 @@ export default function SellerForm() {
   const [bannerFile, setBannerFile] = useState<File | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [bannerUrl, setBannerUrl] = useState<string | null>(null)
+  const [country, setCountry] = useState('Honduras')
+  const [otherCountry, setOtherCountry] = useState('')
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -46,6 +49,11 @@ export default function SellerForm() {
     setPhone(data.phone || '')
     setSlug(data.slug)
     setBannerUrl(data.banner_url || null)
+    const savedCountry = data.country || 'Honduras'
+    setCountry(COUNTRY_OPTIONS.includes(savedCountry as typeof COUNTRY_OPTIONS[number]) ? savedCountry : 'Otro')
+    if (!COUNTRY_OPTIONS.includes(savedCountry as typeof COUNTRY_OPTIONS[number])) {
+      setOtherCountry(savedCountry)
+    }
     setFetchingSeller(false)
   }
 
@@ -67,6 +75,12 @@ export default function SellerForm() {
 
     if (!slug.trim()) {
       setError('El slug es obligatorio')
+      return
+    }
+
+    const finalCountry = country === 'Otro' ? otherCountry.trim() : country
+    if (!finalCountry) {
+      setError('El país es obligatorio')
       return
     }
 
@@ -101,6 +115,7 @@ export default function SellerForm() {
       whatsapp_url: buildWhatsAppUrl(phone),
       slug: slug.trim().toLowerCase(),
       banner_url: finalBannerUrl,
+      country: finalCountry,
     }
 
     let result
@@ -187,6 +202,34 @@ export default function SellerForm() {
         <p className="text-xs text-gray-400 mt-1">
           Se genera automáticamente, pero podés editarlo
         </p>
+      </div>
+
+      {/* Country */}
+      <div>
+        <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+          País *
+        </label>
+        <select
+          id="country"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none bg-white"
+          required
+        >
+          {COUNTRY_OPTIONS.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        {country === 'Otro' && (
+          <input
+            type="text"
+            value={otherCountry}
+            onChange={(e) => setOtherCountry(e.target.value)}
+            className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none mt-2"
+            placeholder="Escribí el nombre del país"
+            required
+          />
+        )}
       </div>
 
       {/* Banner */}

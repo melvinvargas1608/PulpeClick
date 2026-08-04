@@ -1,5 +1,6 @@
 import CatalogFilters from './CatalogFilters';
 import CartButton from './CartButton';
+import { getCountryFlag } from '../lib/countryFlags';
 
 interface Category {
   id: string;
@@ -13,6 +14,7 @@ interface Props {
   onCategoryChange: (categoryId: string) => void;
   onSearchChange: (query: string) => void;
   onCartClick: () => void;
+  country: string;
 }
 
 export default function CartNavbar({
@@ -22,6 +24,7 @@ export default function CartNavbar({
   onCategoryChange,
   onSearchChange,
   onCartClick,
+  country,
 }: Props) {
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">
@@ -37,6 +40,12 @@ export default function CartNavbar({
           onCategoryChange={onCategoryChange}
           onSearchChange={onSearchChange}
         />
+
+        {country && (
+          <span className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+            {getCountryFlag(country)}{country}
+          </span>
+        )}
 
         <CartButton onClick={onCartClick} />
       </div>

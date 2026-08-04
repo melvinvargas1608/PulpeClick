@@ -26,11 +26,12 @@ interface Props {
   sellerId: string;
   whatsappUrl: string;
   bannerUrl?: string | null;
+  country: string;
   products: Product[];
   categories: Category[];
 }
 
-function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, products, categories }: Props) {
+function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, categories }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -54,6 +55,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, pr
         onCategoryChange={setSelectedCategory}
         onSearchChange={setSearchQuery}
         onCartClick={() => setDrawerOpen(true)}
+        country={country}
       />
 
       <div className="max-w-7xl mx-auto px-2 py-6">
@@ -185,7 +187,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, pr
   );
 }
 
-export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, products, categories }: Props) {
+export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, categories }: Props) {
   return (
     <CartProvider>
       <SellerCatalogContent
@@ -193,6 +195,7 @@ export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, banne
         sellerId={sellerId}
         whatsappUrl={whatsappUrl}
         bannerUrl={bannerUrl}
+        country={country}
         products={products}
         categories={categories}
       />

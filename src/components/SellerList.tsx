@@ -5,6 +5,7 @@ import Alert from './ui/Alert'
 import EmptyState from './ui/EmptyState'
 import Switch from './ui/Switch'
 import EditIcon from './icons/EditIcon'
+import { getCountryFlag } from '../lib/countryFlags'
 
 interface Seller {
   id: string
@@ -13,6 +14,7 @@ interface Seller {
   slug: string
   whatsapp_url: string | null
   banner_url: string | null
+  country: string
   is_active: boolean
   created_at: string
 }
@@ -127,6 +129,9 @@ export default function SellerList() {
               <h3 className={`font-semibold truncate ${seller.is_active ? 'text-gray-900' : 'text-gray-400'}`}>
                 {seller.name}
               </h3>
+              <span className={`inline-flex items-center gap-1 text-xs mt-0.5 ${seller.is_active ? 'text-gray-500' : 'text-gray-400'}`}>
+                {getCountryFlag(seller.country)}{seller.country}
+              </span>
               {seller.phone && (
                 <p className={`text-sm mt-0.5 ${seller.is_active ? 'text-gray-500' : 'text-gray-400'}`}>{seller.phone}</p>
               )}
