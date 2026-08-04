@@ -1,5 +1,13 @@
 const DEFAULT_COUNTRY_CODE = '504'; // Honduras — solo usado si no se detecta prefijo internacional
 
+/**
+ * Sanitize phone input in real time.
+ * Only allows: digits, +, spaces, hyphens, parentheses.
+ */
+export function sanitizePhoneInput(value: string): string {
+  return value.replace(/[^+\d\s\-()]/g, '');
+}
+
 export function stripNonDigits(value: string): string {
   return value.replace(/\D/g, '');
 }

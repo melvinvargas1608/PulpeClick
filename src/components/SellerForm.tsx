@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { supabaseClient } from '../lib/supabase-client'
 import { generateSlug } from '../lib/slug'
-import { buildWhatsAppUrl } from '../lib/phone'
+import { buildWhatsAppUrl, sanitizePhoneInput } from '../lib/phone'
 import { uploadBannerImage, deleteBannerImage } from '../lib/storage'
 import BannerUploader from './BannerUploader'
 import Spinner from './ui/Spinner'
@@ -156,7 +156,7 @@ export default function SellerForm() {
           id="phone"
           type="tel"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
           className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none"
           placeholder="+504 1234-5678"
         />

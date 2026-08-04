@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { stripNonDigits, validatePhone } from './phone';
+import { stripNonDigits, validatePhone, sanitizePhoneInput } from './phone';
 import type { CartItem } from '../components/CartProvider';
 
 interface UseCheckoutProps {
@@ -32,7 +32,7 @@ export function useCheckout(props: UseCheckoutProps) {
   });
 
   const setName = (name: string) => setState(s => ({ ...s, name, errors: { ...s.errors, name: undefined }, submitError: '' }));
-  const setPhone = (phone: string) => setState(s => ({ ...s, phone, errors: { ...s.errors, phone: undefined }, submitError: '' }));
+  const setPhone = (phone: string) => setState(s => ({ ...s, phone: sanitizePhoneInput(phone), errors: { ...s.errors, phone: undefined }, submitError: '' }));
 
   const validate = (): boolean => {
     const newErrors: { name?: string; phone?: string } = {};
@@ -42,7 +42,7 @@ export function useCheckout(props: UseCheckoutProps) {
     }
 
     if (!validatePhone(state.phone)) {
-      newErrors.phone = 'Ingresá un número válido (si estás fuera de Honduras incluí el código de país, ej: +503)';
+      newErrors.phone = 'Solo números, espacios, guiones, paréntesis y el signo + para código de país';
     }
 
     setState(s => ({ ...s, errors: newErrors }));
