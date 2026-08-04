@@ -25,11 +25,12 @@ interface Props {
   sellerName: string;
   sellerId: string;
   whatsappUrl: string;
+  bannerUrl?: string | null;
   products: Product[];
   categories: Category[];
 }
 
-function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, products, categories }: Props) {
+function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, products, categories }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -56,10 +57,21 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, products, cat
       />
 
       <div className="max-w-7xl mx-auto px-2 py-6">
-        {/* Header tipo perfil */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{sellerName}</h1>
-          <p className="text-gray-500 text-sm">Catálogo de productos</p>
+        {/* Banner de la tienda */}
+        <div className="relative rounded-2xl overflow-hidden mb-6 h-48 sm:h-64">
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt={`Banner de ${sellerName}`}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-r from-brand to-brand-dark" />
+          )}
+          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white px-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center">{sellerName}</h1>
+            <p className="text-sm text-white/80 mt-1">Catálogo de productos</p>
+          </div>
         </div>
 
         {/* Resultados de búsqueda */}
@@ -171,13 +183,14 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, products, cat
   );
 }
 
-export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, products, categories }: Props) {
+export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, products, categories }: Props) {
   return (
     <CartProvider>
       <SellerCatalogContent
         sellerName={sellerName}
         sellerId={sellerId}
         whatsappUrl={whatsappUrl}
+        bannerUrl={bannerUrl}
         products={products}
         categories={categories}
       />

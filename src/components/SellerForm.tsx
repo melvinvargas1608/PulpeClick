@@ -2,6 +2,8 @@ import { useState, useEffect, type FormEvent } from 'react'
 import { supabaseClient } from '../lib/supabase-client'
 import { generateSlug } from '../lib/slug'
 import { buildWhatsAppUrl } from '../lib/phone'
+import { uploadBannerImage, deleteBannerImage } from '../lib/storage'
+import BannerUploader from './BannerUploader'
 import Spinner from './ui/Spinner'
 import Alert from './ui/Alert'
 
@@ -13,6 +15,9 @@ export default function SellerForm() {
   const [error, setError] = useState('')
   const [editId, setEditId] = useState<string | null>(null)
   const [fetchingSeller, setFetchingSeller] = useState(false)
+  const [bannerFile, setBannerFile] = useState<File | null>(null)
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null)
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -40,6 +45,7 @@ export default function SellerForm() {
     setName(data.name)
     setPhone(data.phone || '')
     setSlug(data.slug)
+    setBannerUrl(data.banner_url || null)
     setFetchingSeller(false)
   }
 
@@ -66,11 +72,35 @@ export default function SellerForm() {
 
     setLoading(true)
 
+    // Handle banner: upload new, or delete removed one
+    let finalBannerUrl = bannerUrl
+
+    if (bannerFile) {
+      // Upload new banner
+      const uploadedUrl = await uploadBannerImage(bannerFile, slug.trim().toLowerCase())
+      if (uploadedUrl) {
+        // Delete old banner if it existed
+        if (bannerUrl) {
+          await deleteBannerImage(bannerUrl)
+        }
+        finalBannerUrl = uploadedUrl
+      } else {
+        setError('Error al subir el banner. Intentá de nuevo.')
+        setLoading(false)
+        return
+      }
+    } else if (bannerPreview === null && bannerUrl) {
+      // Banner was removed
+      await deleteBannerImage(bannerUrl)
+      finalBannerUrl = null
+    }
+
     const sellerData = {
       name: name.trim(),
       phone: phone.trim() || null,
       whatsapp_url: buildWhatsAppUrl(phone),
       slug: slug.trim().toLowerCase(),
+      banner_url: finalBannerUrl,
     }
 
     let result
@@ -155,6 +185,17 @@ export default function SellerForm() {
           Se genera automáticamente, pero podés editarlo
         </p>
       </div>
+
+      {/* Banner */}
+      <BannerUploader
+        imagePreview={bannerPreview}
+        onImageChange={(file, preview) => {
+          setBannerFile(file)
+          setBannerPreview(preview)
+        }}
+        disabled={loading}
+        existingUrl={bannerUrl}
+      />
 
       {/* Error */}
       {error && <Alert variant="error">{error}</Alert>}

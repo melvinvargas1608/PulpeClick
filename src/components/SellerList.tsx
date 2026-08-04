@@ -12,6 +12,7 @@ interface Seller {
   phone: string | null
   slug: string
   whatsapp_url: string | null
+  banner_url: string | null
   is_active: boolean
   created_at: string
 }
@@ -107,8 +108,20 @@ export default function SellerList() {
       {sellers.map((seller) => (
         <div
           key={seller.id}
-          className={`bg-white border rounded-xl p-4 transition-shadow ${seller.is_active ? 'border-gray-200 hover:shadow-md' : 'border-gray-100 bg-gray-50/50'}`}
+          className={`bg-white border rounded-xl overflow-hidden transition-shadow ${seller.is_active ? 'border-gray-200 hover:shadow-md' : 'border-gray-100 bg-gray-50/50'}`}
         >
+          {/* Banner thumbnail */}
+          {seller.banner_url && (
+            <div className="aspect-[5/1] w-full bg-gray-100 overflow-hidden">
+              <img
+                src={seller.banner_url}
+                alt={`Banner de ${seller.name}`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
+          <div className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <h3 className={`font-semibold truncate ${seller.is_active ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -161,6 +174,7 @@ export default function SellerList() {
             >
               Ver productos
             </a>
+          </div>
           </div>
         </div>
       ))}

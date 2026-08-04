@@ -43,6 +43,56 @@ export async function deleteProductImage(imageUrl: string): Promise<void> {
 }
 
 /**
+ * Upload a seller banner image to Supabase Storage (banners bucket).
+ * Recommended dimensions: 1920×384px (5:1 ratio).
+ * Returns the public URL or null on failure.
+ */
+export async function uploadBannerImage(
+  file: File,
+  sellerSlug: string,
+): Promise<string | null> {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+  const filePath = `${sellerSlug}/${fileName}`;
+
+  const { error } = await supabaseClient.storage
+    .from('banners')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (error) {
+    console.error('Banner upload error:', error);
+    return null;
+  }
+
+  const { data: urlData } = supabaseClient.storage
+    .from('banners')
+    .getPublicUrl(filePath);
+
+  return urlData.publicUrl;
+}
+
+/**
+ * Delete a banner image from Supabase Storage by its public URL.
+ */
+export async function deleteBannerImage(imageUrl: string): Promise<void> {
+  try {
+    const urlParts = imageUrl.split('/');
+    const bannersIdx = urlParts.indexOf('banners');
+    if (bannersIdx !== -1) {
+      const filePath = urlParts.slice(bannersIdx + 1).join('/');
+      if (filePath) {
+        await supabaseClient.storage.from('banners').remove([filePath]);
+      }
+    }
+  } catch (err) {
+    console.error('Error deleting banner image:', err);
+  }
+}
+
+/**
  * Extract the storage path from a Supabase public URL.
  * Example: https://xxx.supabase.co/storage/v1/object/public/products/slug/file.jpg → slug/file.jpg
  */
