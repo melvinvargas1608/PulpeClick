@@ -2,7 +2,7 @@
 
 ## ¿Qué es?
 
-Servicio de **catálogos digitales con IA** para emprendedores de Honduras que venden por WhatsApp.
+Servicio de **catálogos digitales con IA** para emprendedores de Centroamérica y Latinoamérica que venden por WhatsApp.
 
 ## ¿Quién lo usa?
 
@@ -18,7 +18,7 @@ Servicio de **catálogos digitales con IA** para emprendedores de Honduras que v
 | Estilos | Tailwind CSS v4 (mobile-first) con design tokens de marca |
 | Tipografía | Inter (Google Fonts) — pesos 400, 500, 600, 700 |
 | Base de datos | Supabase (PostgreSQL) con tipos generados |
-| Almacenamiento | Supabase Storage (bucket `products`) |
+| Almacenamiento | Supabase Storage (buckets `products`, `banners`) |
 | Autenticación admin | Cookie `admin_auth` + PIN en .env |
 | IA | Gemini API (`gemini-3.5-flash-lite`) |
 | Hosting | Vercel (adapter `@astrojs/vercel`) |
@@ -80,7 +80,7 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 
 ### Tablas
 
-- **sellers**: vendedores registrados (name, phone, whatsapp_url, slug) — antes llamada `clients`
+- **sellers**: vendedores registrados (name, phone, whatsapp_url, slug, banner_url, country, is_active)
 - **products**: productos cargados (seller_id, name, description, price, image_url, category_id, details)
 - **categories**: categorías de productos (name)
 - **customers**: compradores (name, phone)
@@ -108,18 +108,22 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 - `004_add_orders.sql` — orders + order_items + RLS
 - `005_refactor_sellers_customers.sql` — clients→sellers, category_id FK, customers, orders.customer_id, elimina posts.image_url
 - `007_remove_posts_table.sql` — elimina tabla posts
+- `008_add_sellers_is_active.sql` — columna is_active en sellers (activar/desactivar catálogo)
+- `009_add_sellers_banner_url.sql` — columna banner_url en sellers (banner de tienda desde Canva)
+- `010_add_sellers_country.sql` — columna country en sellers (obligatorio, default Honduras)
 
 ### Storage
 
 - Bucket `products` — público, políticas lectura pública + escritura admin
+- Bucket `banners` — público, imágenes de banner de vendedores. Políticas: lectura pública + escritura autenticada (INSERT, DELETE). Formato recomendado: 1920×384px.
 
 ## Funcionalidades
 
 ### Panel Admin (`/admin`)
 
 - **AdminLayout.astro**: layout compartido con auth check, header "← Volver" + "Cerrar sesión", y slot de contenido. Todas las páginas admin lo usan excepto login/logout y el index (que tiene layout especial).
-- **Nuevo Vendedor**: `/admin/nuevo-vendedor` — SellerForm.tsx
-- **Vendedores**: `/admin/vendedores` — SellerList.tsx con "Ver catálogo", "Ver productos", "+ Producto", "Editar"
+- **Nuevo Vendedor**: `/admin/nuevo-vendedor` — SellerForm.tsx (name, phone, country, slug, banner opcional)
+- **Vendedores**: `/admin/vendedores` — SellerList.tsx con bandera del país, "Ver catálogo", "Ver productos", "+ Producto", "Editar"
 - **Productos**: `/admin/productos?seller=SLUG` — lista de productos con editar/eliminar
 - **Agregar Producto**: `/admin/nuevo-producto` — SelectSeller → ProductCreateForm (wizard IA)
 - **Editar Producto**: `/admin/editar-producto?id=UUID` — ProductEditForm
@@ -136,11 +140,11 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 ### Catálogo Público (`/catalogo/[slug]`)
 
 - SSR: fetch seller + products + categorías del vendedor
-- **Navbar**: logo PulpeClick (`h-12`, link a home) + CatalogFilters (dropdown categorías + buscador) + CartButton
+- **Navbar**: logo PulpeClick (`h-12`, link a home) + CatalogFilters (dropdown categorías + buscador) + bandera del país + CartButton
 - Filtros combinados: categoría + nombre. "Limpiar filtros" + contador de resultados
-- Header tipo perfil: nombre del vendedor + "Catálogo de productos"
+- Banner de tienda: si el vendedor tiene banner (Canva, 1920×384px) se muestra solo la imagen. Si no tiene, gradiente verde de marca con nombre centrado + "Catálogo de productos"
 - Grid responsive: 1/2/4 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card)
-- CartQuantityButton por producto
+- CartQuantityButton: solo botón "Agregar" (1 unidad) en tarjeta. Una vez en carrito → badge "En carrito". Cantidades se ajustan en el carrito.
 - Botón flotante WhatsApp (`bg-hot`, abajo derecha) para contactar al vendedor
 - Footer: "Catálogo creado con PulpeClick"
 
@@ -148,7 +152,10 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 
 - **CartProvider**: React Context + localStorage (`pulpeclick-cart`)
 - **CartDrawer**: panel lateral con productos, cantidades, total + formulario checkout inline
-- Checkout validaciones: nombre (solo letras, min 3), teléfono (dígitos/+-()/espacios, min 8)
+- Checkout validaciones: nombre (solo letras, min 3), teléfono (solo dígitos/+-()/espacios, min 8 dígitos)
+- **Teléfono internacional**: si el número empieza con `+` (ej. `+503`), se usa el código de país directamente. Si no, se asume Honduras (`+504`). Todos los países soportados.
+- **Moneda automática**: se deriva del país del vendedor. Honduras=L, Guatemala=Q, El Salvador/México/Colombia=\$, Costa Rica=₡, Nicaragua=C\$, Panamá=B/.
+- Cantidad mínima en carrito: el botón `−` se deshabilita en 1 unidad. Para eliminar, usar el icono de basura.
 - **useCheckout hook**: lógica de checkout extraída (find-or-create customer, insert order/items, WhatsApp message)
 - Mensaje WhatsApp: sin emojis, formato `*negrita*`, `encodeURIComponent`
 
@@ -182,12 +189,13 @@ src/
 │   │   └── Switch.tsx          # Toggle con animación
 │   ├── CartButton.tsx         # Botón carrito con badge
 │   ├── CartDrawer.tsx         # Panel lateral + checkout (usa useCheckout)
-│   ├── CartNavbar.tsx         # Navbar: logo + CatalogFilters + CartButton
+│   ├── CartNavbar.tsx         # Navbar: logo + CatalogFilters + bandera país + CartButton
 │   ├── CartProvider.tsx       # Contexto React carrito (localStorage)
-│   ├── CartQuantityButton.tsx # Botón agregar/cantidad en productos
+│   ├── CartQuantityButton.tsx # Botón "Agregar" + badge "En carrito"
 │   ├── CatalogFilters.tsx     # Dropdown categorías + buscador
 │   ├── CategoryManager.tsx    # CRUD de categorías
 │   ├── DeleteProductButton.tsx # Botón eliminar con ConfirmDialog
+│   ├── BannerUploader.tsx     # Upload de banner (max 5MB, 1920×384px)
 │   ├── PostImageGenerator.tsx # Tarjeta WhatsApp descargable
 │   ├── ProductCreateForm.tsx  # Wizard crear producto (2 pasos + IA)
 │   ├── ProductEditForm.tsx    # Formulario editar producto
@@ -201,10 +209,12 @@ src/
 │   ├── Layout.astro           # Layout base (HTML, meta, footer)
 │   └── AdminLayout.astro      # Layout admin (auth check, header común)
 ├── lib/
-│   ├── gemini.ts              # Cliente Gemini + prompts + parseGeminiResponse
-│   ├── phone.ts               # stripNonDigits, formatPhone, buildWhatsAppUrl, validatePhone
-│   ├── slug.ts                # generateSlug
-│   ├── storage.ts             # deleteProductImage
+│   ├── countryFlags.ts        # Banderas emoji y símbolos de moneda por país
+│   ├── format.ts               # formatPrice(price, currency)
+│   ├── gemini.ts               # Cliente Gemini + prompts + parseGeminiResponse
+│   ├── phone.ts                # stripNonDigits, sanitizePhoneInput, formatPhone, buildWhatsAppUrl, validatePhone (internacional)
+│   ├── slug.ts                 # generateSlug
+│   ├── storage.ts              # uploadProductImage, deleteProductImage, uploadBannerImage, deleteBannerImage
 │   ├── supabase.ts            # Cliente Supabase server (service role, tipado)
 │   ├── supabase-client.ts     # Cliente Supabase browser (anon key, tipado)
 │   └── useCheckout.ts         # Hook de checkout (customer, order, WhatsApp)
@@ -276,6 +286,11 @@ pnpm run build        # Build para producción
 26. **Zoom solo en imagen**: Usar `group` en contenedor + `group-hover:scale-105` en `<img>`. No aplicar zoom a toda la card. `overflow-hidden` en el contenedor recorta el excedente.
 27. **Favicons anti-cache**: Agregar `?v=2` a los href de favicons para forzar recarga en navegadores que cachearon un favicon anterior (ej. el de Vercel).
 28. **PWA manifest**: `theme_color` en `site.webmanifest` debe coincidir con el color de marca (`#17877f`).
+29. **Banner de tienda**: Subida desde admin con BannerUploader. Bucket `banners` público. Formato recomendado 1920×384px. Si el banner ya tiene el nombre, no se muestra overlay con texto duplicado.
+30. **Teléfono internacional**: Si el número empieza con `+`, se usa el código de país completo para WhatsApp. Si no, se asume Honduras (+504). Validación: solo dígitos, `+`, `-`, ` ` y `()`. Backward compatible con números locales.
+31. **País del vendedor**: Campo obligatorio en SellerForm. Dropdown con 8 países + "Otro" (texto libre). Se muestra bandera emoji en catálogo y admin. Helper `countryFlags.ts` centraliza banderas y monedas.
+32. **Moneda por país**: Derivada automáticamente del campo `country`. `formatPrice(price, currency)` acepta parámetro de moneda. Sin migración — todo en runtime.
+33. **Carrito UX**: Botón `−` no elimina (se deshabilita en 1). Eliminación solo con icono de basura. La tarjeta de producto solo muestra "Agregar" → luego "En carrito". Cantidades se ajustan solo en el carrito.
 
 ## Próximos pasos
 
