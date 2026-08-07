@@ -30,23 +30,23 @@ export default function CatalogFilters({
         isInputFocused ? 'ring-2 ring-hot rounded-lg' : ''
       }`}
     >
-      <div className={`inline-flex shrink-0 ${isSelectFocused ? 'ring-2 ring-hot rounded-lg' : ''}`}>
-        <select
-          value={selectedCategory}
-          onChange={(e) => onCategoryChange(e.target.value)}
-          onFocus={() => setIsSelectFocused(true)}
-          onBlur={() => setIsSelectFocused(false)}
-          className="h-10 px-1 py-2 border border-gray-600 rounded-l-lg text-sm bg-[#D4D4D4] text-gray-900 outline-none max-w-16 sm:max-w-24 truncate"
-          aria-label="Filtrar por categoría"
-        >
-          <option value="">Todas</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <select
+        value={selectedCategory}
+        onChange={(e) => onCategoryChange(e.target.value)}
+        onFocus={() => setIsSelectFocused(true)}
+        onBlur={() => setIsSelectFocused(false)}
+        className={`h-10 px-1 py-2 border border-gray-600 text-sm bg-[#D4D4D4] text-gray-900 outline-none shrink-0 max-w-16 sm:max-w-24 truncate ${
+          isSelectFocused ? 'ring-2 ring-hot rounded-lg' : 'rounded-l-lg'
+        }`}
+        aria-label="Filtrar por categoría"
+      >
+        <option value="">Todas</option>
+        {categories.map((cat) => (
+          <option key={cat.id} value={cat.id}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
 
       <div className="flex flex-1 min-w-0 items-stretch">
         <div className="relative flex-1 min-w-0">
