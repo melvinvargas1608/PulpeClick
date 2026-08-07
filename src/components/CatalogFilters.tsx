@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 
 interface Category {
@@ -20,12 +21,23 @@ export default function CatalogFilters({
   onCategoryChange,
   onSearchChange,
 }: Props) {
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+
   return (
-    <div className="flex-1 flex items-center gap-0 min-w-0">
+    <div
+      className={`flex-1 flex items-center gap-0 min-w-0 ${
+        isInputFocused ? 'ring-2 ring-hot rounded-lg' : ''
+      }`}
+    >
       <select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="h-10 px-1 py-2 border border-gray-600 rounded-l-lg text-sm bg-gray-800 text-white focus:ring-2 focus:ring-hot focus:border-hot outline-none shrink-0 max-w-16 sm:max-w-24 truncate"
+        onFocus={() => setIsSelectFocused(true)}
+        onBlur={() => setIsSelectFocused(false)}
+        className={`h-10 px-1 py-2 border border-gray-600 rounded-l-lg text-sm bg-[#D4D4D4] text-gray-900 outline-none shrink-0 max-w-16 sm:max-w-24 truncate ${
+          isSelectFocused ? 'ring-2 ring-hot' : ''
+        }`}
         aria-label="Filtrar por categoría"
       >
         <option value="">Todas</option>
@@ -42,8 +54,10 @@ export default function CatalogFilters({
             type="text"
             value={searchQuery}
             onChange={(e: ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
             placeholder="Buscar en el catálogo"
-            className="w-full h-10 pl-3 pr-3 py-2 border border-gray-600 border-l-0 rounded-none text-sm bg-white text-gray-900 focus:ring-2 focus:ring-hot focus:border-hot outline-none"
+            className="w-full h-10 pl-3 pr-3 py-2 border border-gray-600 border-l-0 rounded-none text-sm bg-white text-gray-900 outline-none"
             aria-label="Buscar productos"
           />
         </div>
