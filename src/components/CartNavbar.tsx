@@ -27,10 +27,10 @@ export default function CartNavbar({
   country,
 }: Props) {
   return (
-    <nav className="bg-white border-b border-gray-200 shadow-sm">
+    <nav className="bg-navbar border-b border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center gap-3">
         <div className="shrink-0">
-          <img src="/logo-512.png" alt="PulpeClick" className="h-12 w-auto" />
+          <img src="/logo-blanco-512.png" alt="PulpeClick" className="h-12 w-auto" />
         </div>
 
         <CatalogFilters
@@ -42,7 +42,7 @@ export default function CartNavbar({
         />
 
         {country && (
-          <span className="inline-flex items-center text-sm text-gray-500 shrink-0" title={country}>
+          <span className="inline-flex items-center text-sm text-white shrink-0" title={country}>
             {getCountryFlag(country)}
           </span>
         )}

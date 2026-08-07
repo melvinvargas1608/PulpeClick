@@ -25,7 +25,7 @@ export default function CatalogFilters({
       <select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
-        className="h-10 px-1 py-2 border border-gray-300 rounded-l-lg text-sm bg-gray-50 text-gray-700 focus:ring-2 focus:ring-brand focus:border-brand outline-none shrink-0 max-w-16 sm:max-w-24 truncate"
+        className="h-10 px-1 py-2 border border-gray-600 rounded-l-lg text-sm bg-gray-800 text-white focus:ring-2 focus:ring-hot focus:border-hot outline-none shrink-0 max-w-16 sm:max-w-24 truncate"
         aria-label="Filtrar por categoría"
       >
         <option value="">Todas</option>
@@ -43,7 +43,7 @@ export default function CatalogFilters({
             value={searchQuery}
             onChange={(e: ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
             placeholder="Buscar en el catálogo"
-            className="w-full h-10 pl-3 pr-3 py-2 border border-gray-300 border-l-0 rounded-none text-sm focus:ring-2 focus:ring-brand focus:border-brand outline-none"
+            className="w-full h-10 pl-3 pr-3 py-2 border border-gray-600 border-l-0 rounded-none text-sm bg-white text-gray-900 focus:ring-2 focus:ring-hot focus:border-hot outline-none"
             aria-label="Buscar productos"
           />
         </div>

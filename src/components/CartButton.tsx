@@ -12,7 +12,7 @@ export default function CartButton({ onClick }: Props) {
     <button
       type="button"
       onClick={onClick}
-      className="relative p-2 text-gray-700 hover:text-brand transition-colors shrink-0"
+      className="relative p-2 text-white hover:text-hot transition-colors shrink-0"
       aria-label="Abrir carrito"
     >
       <CartIcon size={28} />

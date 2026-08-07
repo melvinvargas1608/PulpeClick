@@ -30,6 +30,10 @@
   --color-deep-dark: #0b3d66;
   --color-deep-light: #e8eff6;
 
+  /* Azul oscuro navbar — estilo Amazon (#131921) */
+  --color-navbar: #131921;
+  --color-navbar-dark: #0f141a; /* hover/focus */
+
   /* ── Radios ─────────────────────────────── */
   --radius-card: 16px;
   --radius-btn: 12px;
