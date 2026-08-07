@@ -27,7 +27,7 @@ export default function CatalogFilters({
   return (
     <div
       className={`flex-1 flex items-center gap-0 min-w-0 ${
-        isInputFocused ? 'ring-2 ring-hot rounded-lg' : ''
+        isInputFocused ? 'ring-2 ring-hot rounded' : ''
       }`}
     >
       <select
@@ -36,7 +36,7 @@ export default function CatalogFilters({
         onFocus={() => setIsSelectFocused(true)}
         onBlur={() => setIsSelectFocused(false)}
         className={`h-10 px-1 py-2 text-sm bg-[#D4D4D4] text-gray-900 outline-none shrink-0 max-w-16 sm:max-w-24 truncate ${
-          isSelectFocused ? 'border-2 border-hot rounded-lg' : 'border border-gray-600 rounded-l-lg'
+          isSelectFocused ? 'border-2 border-hot rounded' : 'border border-gray-600 rounded-l'
         }`}
         aria-label="Filtrar por categoría"
       >
@@ -63,7 +63,7 @@ export default function CatalogFilters({
         </div>
         <button
           type="button"
-          className="h-10 w-11 shrink-0 flex items-center justify-center bg-hot hover:bg-hot-dark text-white rounded-r-lg transition-colors"
+          className="h-10 w-11 shrink-0 flex items-center justify-center bg-hot hover:bg-hot-dark text-white rounded-r transition-colors"
           aria-label="Buscar"
         >
           <svg
