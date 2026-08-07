@@ -39,6 +39,8 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 | `deep` | `#0F4C81` azul | Footer, badges premium, estadísticas |
 | `deep-dark` | `#0B3D66` | Hover de deep |
 | `deep-light` | `#E8EFF6` | Fondos institucionales |
+| `navbar` | `#131921` azul oscuro | Navbar catálogo + footer (estilo Amazon) |
+| `navbar-dark` | `#0F141A` | Hover/focus del navbar |
 
 **Reglas de marca** (de `marca.txt`):
 - 60% blanco / 25% turquesa / 10% naranja / 5% azul
@@ -67,9 +69,9 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 
 | Ubicación | Archivo | Tamaño |
 |---|---|---|
-| Navbar catálogo | `/logo-512.png` | `h-12` (48px), link a home |
+| Navbar catálogo | `/logo-blanco-512.png` | `h-12` (48px), **sin link** (estático, no saca al cliente de la tienda) |
 | Landing page | `/logo-512.png` | `h-24` (96px) |
-| Footer | `/logo-blanco-512.png` | `h-12` (48px), sobre fondo `deep` |
+| Footer | `/logo-blanco-512.png` | `h-12` (48px), **sin link**, sobre fondo `navbar` |
 | Favicon SVG | `/favicon.svg` | Link en `<head>` |
 | Favicon ICO | `/favicon.ico` | Fallback |
 | Apple touch | `/apple-touch-icon.png` | iOS |
@@ -140,14 +142,14 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 ### Catálogo Público (`/catalogo/[slug]`)
 
 - SSR: fetch seller + products + categorías del vendedor
-- **Navbar**: logo PulpeClick (`h-12`, link a home) + CatalogFilters (dropdown categorías + buscador) + bandera del país + CartButton
+- **Navbar**: fondo azul oscuro `navbar` (#131921 estilo Amazon) con **logo blanco** (`h-12`, estático sin link) + CatalogFilters (dropdown categorías + buscador) + bandera del país (visible en mobile) + CartButton (icono blanco)
 - Filtros combinados: categoría + nombre. "Limpiar filtros" + contador de resultados
+- **CatalogFilters**: select categorías (`max-w-16 sm:max-w-24`, `px-1`, fondo `#D4D4D4`, texto gris oscuro) + input blanco "Buscar en el catálogo" + botón lupa naranja (`bg-hot`, `rounded-r`). Bordes redondeados 4px (`rounded`/`rounded-l`/`rounded-r`). Foco del input → ring naranja envuelve TODO el filtro. Foco del select → borde naranja `border-2 border-hot` solo en el select (usar `border` no `ring` para evitar desborde debajo del buscador). Línea separadora select/buscador siempre gris (`border-gray-600`)
 - Banner de tienda: si el vendedor tiene banner (Canva, 1920×384px) se muestra solo la imagen. Si no tiene, gradiente verde de marca con nombre centrado + "Catálogo de productos"
 - Grid responsive: 1/2/4 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card)
 - CartQuantityButton: solo botón "Agregar" (1 unidad) en tarjeta. Una vez en carrito → badge "En carrito". Cantidades se ajustan en el carrito.
 - Botón flotante WhatsApp (`bg-hot`, abajo derecha) para contactar al vendedor
 - Footer: "Catálogo creado con PulpeClick"
-
 ### Carrito y Pedidos
 
 - **CartProvider**: React Context + localStorage (`pulpeclick-cart`)
@@ -291,6 +293,11 @@ pnpm run build        # Build para producción
 31. **País del vendedor**: Campo obligatorio en SellerForm. Dropdown con 8 países + "Otro" (texto libre). Se muestra bandera emoji en catálogo y admin. Helper `countryFlags.ts` centraliza banderas y monedas.
 32. **Moneda por país**: Derivada automáticamente del campo `country`. `formatPrice(price, currency)` acepta parámetro de moneda. Sin migración — todo en runtime.
 33. **Carrito UX**: Botón `−` no elimina (se deshabilita en 1). Eliminación solo con icono de basura. La tarjeta de producto solo muestra "Agregar" → luego "En carrito". Cantidades se ajustan solo en el carrito.
+34. **Logo no-link en catálogo**: El logo del navbar del catálogo NO debe llevar a `/` porque la home solo tiene el botón "Panel Admin" y saca al cliente de la tienda. Logo estático con `<div>` (no `<a>`). En JSX usar `className`, no `class`.
+35. **Navbar oscuro estilo Amazon**: `bg-navbar` (#131921) con logo blanco. Select oscuro con texto blanco; input de búsqueda blanco destacado; botón naranja contrasta. `hidden sm:inline-flex` oculta en mobile — usar solo `inline-flex` para mostrar en todos los tamaños.
+36. **Ring vs border en focus**: `ring` es box-shadow que se dibuja POR FUERA del elemento y se desborda debajo de elementos adyacentes. Para resaltar un elemento pegado a otros (ej. select al lado del buscador), usar `border-2 border-hot` que se dibuja DENTRO del box.
+37. **Focus grupal**: Para que el foco del input resalte todo el grupo (select + input + botón), usar `useState` de focus en el padre y aplicar `ring-2 ring-hot` al contenedor. Para resaltar SOLO un hijo (ej. select), darle su propio estado y borde propio.
+38. **Redondeos del filtro**: 4px (`rounded`, `rounded-l`, `rounded-r`) en el filtro del catálogo. El patrón e-commerce prefiere esquinas más cuadradas que los 16px de marca.
 
 ## Próximos pasos
 
