@@ -35,8 +35,8 @@ export default function CatalogFilters({
         onChange={(e) => onCategoryChange(e.target.value)}
         onFocus={() => setIsSelectFocused(true)}
         onBlur={() => setIsSelectFocused(false)}
-        className={`h-10 px-1 py-2 border border-gray-600 text-sm bg-[#D4D4D4] text-gray-900 outline-none shrink-0 max-w-16 sm:max-w-24 truncate ${
-          isSelectFocused ? 'ring-2 ring-hot rounded-lg' : 'rounded-l-lg'
+        className={`h-10 px-1 py-2 text-sm bg-[#D4D4D4] text-gray-900 outline-none shrink-0 max-w-16 sm:max-w-24 truncate ${
+          isSelectFocused ? 'border-2 border-hot rounded-lg' : 'border border-gray-600 rounded-l-lg'
         }`}
         aria-label="Filtrar por categoría"
       >
