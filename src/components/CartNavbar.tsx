@@ -29,9 +29,9 @@ export default function CartNavbar({
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center gap-3">
-        <a href="/" class="shrink-0" aria-label="PulpeClick — Inicio">
-          <img src="/logo-512.png" alt="PulpeClick" class="h-12 w-auto" />
-        </a>
+        <div className="shrink-0">
+          <img src="/logo-512.png" alt="PulpeClick" className="h-12 w-auto" />
+        </div>
 
         <CatalogFilters
           categories={categories}
