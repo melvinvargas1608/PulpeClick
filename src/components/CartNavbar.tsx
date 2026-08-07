@@ -42,7 +42,7 @@ export default function CartNavbar({
         />
 
         {country && (
-          <span className="hidden sm:inline-flex items-center text-sm text-gray-500 shrink-0" title={country}>
+          <span className="inline-flex items-center text-sm text-gray-500 shrink-0" title={country}>
             {getCountryFlag(country)}
           </span>
         )}
