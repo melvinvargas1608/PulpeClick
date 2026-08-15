@@ -83,7 +83,7 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 ### Tablas
 
 - **sellers**: vendedores registrados (name, phone, whatsapp_url, slug, banner_url, country, is_active)
-- **products**: productos cargados (seller_id, name, description, price, image_url, category_id, details)
+- **products**: productos cargados (seller_id, name, description, price, original_price, image_url, category_id, details)
 - **categories**: categorías de productos (name)
 - **customers**: compradores (name, phone)
 - **orders**: pedidos (seller_id, customer_id, customer_name, customer_phone, total_amount, status)
@@ -113,6 +113,8 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 - `008_add_sellers_is_active.sql` — columna is_active en sellers (activar/desactivar catálogo)
 - `009_add_sellers_banner_url.sql` — columna banner_url en sellers (banner de tienda desde Canva)
 - `010_add_sellers_country.sql` — columna country en sellers (obligatorio, default Honduras)
+- `009_add_orders_seller_created_at_index.sql` — índice `idx_orders_seller_created_at` para cálculo de "Más vendido" (pedidos últimos 30 días)
+- `010_add_product_original_price.sql` — columna original_price en products (precio original opcional para ofertas, tachado)
 
 ### Storage
 
@@ -146,7 +148,11 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 - Filtros combinados: categoría + nombre. "Limpiar filtros" + contador de resultados
 - **CatalogFilters**: select categorías (`max-w-16 sm:max-w-24`, `px-1`, fondo `#D4D4D4`, texto gris oscuro) + input blanco "Buscar en el catálogo" + botón lupa naranja (`bg-hot`, `rounded-r`). Bordes redondeados 4px (`rounded`/`rounded-l`/`rounded-r`). Foco del input → ring naranja envuelve TODO el filtro. Foco del select → borde naranja `border-2 border-hot` solo en el select (usar `border` no `ring` para evitar desborde debajo del buscador). Línea separadora select/buscador siempre gris (`border-gray-600`)
 - Banner de tienda: si el vendedor tiene banner (Canva, 1920×384px) se muestra solo la imagen. Si no tiene, gradiente verde de marca con nombre centrado + "Catálogo de productos"
-- Grid responsive: 1/2/4 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card)
+- Grid responsive: 1/2/5 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card). Card compactada (padding `p-3`, imagen `p-2`, descripción `line-clamp-2`), esquinas `rounded-md` (6px), fondo de imagen `bg-gray-50`
+- **Badges sobre la imagen**: "Más vendido" (arriba-izquierda, `bg-hot`) = top 20% de productos más vendidos en los últimos 30 días (sin tope máximo). "Nuevo" (arriba-derecha, `bg-brand`) = producto con `created_at` en los últimos 7 días. Ambos dinámicos, se recalculan en cada carga
+- **Precio original**: si `original_price` > `price`, se muestra tachado a la derecha del precio de venta (text-sm gris `line-through`)
+- Botón "Agregar al carrito" ancho completo (`w-full`), verde marca (`bg-brand`), bordes `rounded-full`, debajo del precio
+- **Paginación cliente**: 20 productos por página, controles abajo de la grilla, reinicio a página 1 al filtrar
 - CartQuantityButton: solo botón "Agregar" (1 unidad) en tarjeta. Una vez en carrito → badge "En carrito". Cantidades se ajustan en el carrito.
 - Botón flotante WhatsApp (`bg-hot`, abajo derecha) para contactar al vendedor
 - Footer: "Catálogo creado con PulpeClick"
@@ -298,6 +304,11 @@ pnpm run build        # Build para producción
 36. **Ring vs border en focus**: `ring` es box-shadow que se dibuja POR FUERA del elemento y se desborda debajo de elementos adyacentes. Para resaltar un elemento pegado a otros (ej. select al lado del buscador), usar `border-2 border-hot` que se dibuja DENTRO del box.
 37. **Focus grupal**: Para que el foco del input resalte todo el grupo (select + input + botón), usar `useState` de focus en el padre y aplicar `ring-2 ring-hot` al contenedor. Para resaltar SOLO un hijo (ej. select), darle su propio estado y borde propio.
 38. **Redondeos del filtro**: 4px (`rounded`, `rounded-l`, `rounded-r`) en el filtro del catálogo. El patrón e-commerce prefiere esquinas más cuadradas que los 16px de marca.
+39. **Badge "Más vendido"**: top 20% (Math.ceil(n*0.2)) de productos más vendidos en los últimos 30 días, sin tope máximo. Cálculo: orders del seller con `created_at >= 30 días` → order_items de esas orders → sumar `quantity` por product_id → ordenar desc → slice(0, badgeCount).
+40. **Badge "Nuevo"**: producto con `created_at` en los últimos 7 días. Ambos badges dinámicos (sin columnas en DB, se recalculan en cada carga).
+41. **Precio original**: columna `original_price` opcional. Se muestra tachado a la derecha del precio si `original_price > price`. Validación en forms: original debe ser mayor que actual. Badge "Oferta" en admin.
+42. **Paginación cliente**: 20 productos por página en SellerCatalog. `useEffect` resetea a página 1 al cambiar filtros, y ajusta la página si los resultados se achican. `goToPage` hace `window.scrollTo` al top.
+43. **Bug de upload**: al cargar datos existentes para editar, setear TANTO `bannerUrl`/`oldImageUrl` COMO `bannerPreview`/`imagePreview`. Si solo se setea la URL y no el preview, el form cree que se removió la imagen y la borra al guardar.
 
 ## Próximos pasos
 
