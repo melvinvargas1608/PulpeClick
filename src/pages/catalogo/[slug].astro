@@ -28,43 +28,46 @@ const { data: products } = await supabase
 
 const allProducts = products || [];
 
-// Novedades: productos agregados en los últimos 7 días
+// Novedades: IDs de productos agregados en los últimos 7 días
 const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-const newProducts = allProducts.filter(
-  (p) => p.created_at && new Date(p.created_at) >= sevenDaysAgo
-);
+const newProductIds = allProducts
+  .filter((p) => p.created_at && new Date(p.created_at) >= sevenDaysAgo)
+  .map((p) => p.id);
 
-// Destacados: top 5 más vendidos por cantidad de unidades
-const productIds = allProducts.map((p) => p.id);
-let bestSellers: typeof allProducts = [];
-if (productIds.length > 0) {
-  const { data: orderItems } = await supabase
-    .from('order_items')
-    .select('product_id, quantity')
-    .in('product_id', productIds);
+// Más vendidos: top 20% de ventas en los últimos 30 días (sin tope máximo)
+const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+let bestSellerIds: string[] = [];
+if (allProducts.length > 0) {
+  const { data: recentOrders } = await supabase
+    .from('orders')
+    .select('id')
+    .eq('seller_id', seller.id)
+    .gte('created_at', thirtyDaysAgo.toISOString());
 
-  const salesByProduct = (orderItems || []).reduce<Record<string, number>>(
-    (acc, item) => {
-      acc[item.product_id] = (acc[item.product_id] || 0) + item.quantity;
-      return acc;
-    },
-    {}
-  );
+  const orderIds = (recentOrders || []).map((o) => o.id);
 
-  const bestSellerIds = Object.entries(salesByProduct)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([id]) => id);
+  if (orderIds.length > 0) {
+    const { data: recentItems } = await supabase
+      .from('order_items')
+      .select('product_id, quantity')
+      .in('order_id', orderIds);
 
-  bestSellers = allProducts.filter((p) => bestSellerIds.includes(p.id));
+    const salesByProduct = (recentItems || []).reduce<Record<string, number>>(
+      (acc, item) => {
+        acc[item.product_id] = (acc[item.product_id] || 0) + item.quantity;
+        return acc;
+      },
+      {}
+    );
+
+    const badgeCount = Math.ceil(allProducts.length * 0.2);
+
+    bestSellerIds = Object.entries(salesByProduct)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, badgeCount)
+      .map(([id]) => id);
+  }
 }
-
-// Resto: productos que no están en ninguna de las dos secciones
-const restProducts = allProducts.filter(
-  (p) =>
-    !newProducts.find((n) => n.id === p.id) &&
-    !bestSellers.find((b) => b.id === p.id)
-);
 
 // Get unique categories used by this seller
 const categoryIds = [...new Set(allProducts.map(p => p.category_id).filter((id): id is string => id !== null && id !== undefined))];
@@ -86,9 +89,9 @@ if (categoryIds.length > 0) {
     whatsappUrl={seller.whatsapp_url || ''}
     bannerUrl={seller.banner_url}
     country={seller.country || 'Honduras'}
-    products={restProducts}
-    newProducts={newProducts}
-    bestSellers={bestSellers}
+    products={allProducts}
+    newProductIds={newProductIds}
+    bestSellerIds={bestSellerIds}
     categories={categories}
     client:load
   />

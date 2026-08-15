@@ -18,12 +18,12 @@ interface Props {
   bannerUrl?: string | null;
   country: string;
   products: Product[];
-  newProducts: Product[];
-  bestSellers: Product[];
+  newProductIds: string[];
+  bestSellerIds: string[];
   categories: Category[];
 }
 
-function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProducts, bestSellers, categories }: Props) {
+function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProductIds, bestSellerIds, categories }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -36,7 +36,8 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
 
   const hasActiveFilters = selectedCategory !== '' || searchQuery !== '';
 
-  const hasAnyProducts = newProducts.length > 0 || bestSellers.length > 0 || products.length > 0;
+  const newProductIdSet = new Set(newProductIds);
+  const bestSellerIdSet = new Set(bestSellerIds);
 
   const currency = getCurrencySymbol(country);
 
@@ -74,35 +75,6 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
           </div>
         )}
 
-        {/* Novedades — carrusel horizontal de productos recientes */}
-        {newProducts.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Lo más nuevo</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-2 px-2">
-              {newProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="snap-start shrink-0 w-56 sm:w-64"
-                >
-                  <ProductCard product={product} currency={currency} />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Destacados — top más vendidos */}
-        {bestSellers.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">Los más vendidos</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {bestSellers.map((product) => (
-                <ProductCard key={product.id} product={product} currency={currency} />
-              ))}
-            </div>
-          </section>
-        )}
-
         {/* Resultados de búsqueda */}
         {hasActiveFilters && (
           <div className="mb-4 flex items-center justify-between">
@@ -126,7 +98,13 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} currency={currency} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                currency={currency}
+                isNew={newProductIdSet.has(product.id)}
+                isBestSeller={bestSellerIdSet.has(product.id)}
+              />
             ))}
           </div>
         ) : hasActiveFilters ? (
@@ -135,13 +113,13 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
               No se encontraron productos con esos filtros.
             </p>
           </div>
-        ) : !hasAnyProducts ? (
+        ) : (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
             <p className="text-yellow-800 text-sm">
               Este vendedor aún no tiene productos publicados. ¡Volvé pronto!
             </p>
           </div>
-        ) : null}
+        )}
 
         {/* Footer */}
         <div className="mt-8 text-center">
@@ -173,7 +151,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   );
 }
 
-export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProducts, bestSellers, categories }: Props) {
+export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProductIds, bestSellerIds, categories }: Props) {
   return (
     <CartProvider>
       <SellerCatalogContent
@@ -183,8 +161,8 @@ export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, banne
         bannerUrl={bannerUrl}
         country={country}
         products={products}
-        newProducts={newProducts}
-        bestSellers={bestSellers}
+        newProductIds={newProductIds}
+        bestSellerIds={bestSellerIds}
         categories={categories}
       />
     </CartProvider>

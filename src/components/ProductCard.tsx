@@ -14,19 +14,31 @@ export interface Product {
 interface Props {
   product: Product;
   currency: string;
+  isNew?: boolean;
+  isBestSeller?: boolean;
 }
 
-export default function ProductCard({ product, currency }: Props) {
+export default function ProductCard({ product, currency, isNew = false, isBestSeller = false }: Props) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
-        <div className="aspect-square w-full overflow-hidden p-3 group bg-gray-100">
+        <div className="relative aspect-square w-full overflow-hidden p-3 group bg-gray-100">
           <img
             src={product.image_url}
             alt={product.name}
             className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
+          {isBestSeller && (
+            <span className="absolute top-2 left-2 bg-hot text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+              Más vendido
+            </span>
+          )}
+          {isNew && (
+            <span className="absolute top-2 right-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+              Nuevo
+            </span>
+          )}
         </div>
       )}
       <div className="p-4 flex flex-col flex-1">
