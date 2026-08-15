@@ -72,14 +72,14 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
         </div>
       )}
       <div className="p-3 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-3 flex-1">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 mb-1 line-clamp-3">
               {product.name}
             </h3>
           </div>
         </div>
-        <div className="mt-auto pt-2 border-t border-gray-100 space-y-1.5">
+        <div className="pt-2 border-t border-gray-100 space-y-1.5">
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="text-xl font-bold text-hot whitespace-nowrap">
               {formatPrice(product.price, currency)}
