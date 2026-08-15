@@ -5,6 +5,7 @@ export interface ProductFieldsData {
   productName: string;
   categoryId: string;
   price: string;
+  originalPrice: string;
   productDetails: string;
   imagePreview: string | null;
 }
@@ -13,6 +14,7 @@ interface ProductBasicFieldsProps extends ProductFieldsData {
   onNameChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onPriceChange: (value: string) => void;
+  onOriginalPriceChange: (value: string) => void;
   onDetailsChange: (value: string) => void;
   onImageChange: (file: File | null, preview: string | null) => void;
   disabled?: boolean;
@@ -23,11 +25,13 @@ export default function ProductBasicFields({
   productName,
   categoryId,
   price,
+  originalPrice,
   productDetails,
   imagePreview,
   onNameChange,
   onCategoryChange,
   onPriceChange,
+  onOriginalPriceChange,
   onDetailsChange,
   onImageChange,
   disabled = false,
@@ -113,6 +117,27 @@ export default function ProductBasicFields({
             Si no ponés precio, la IA te sugerirá uno
           </p>
         )}
+      </div>
+
+      {/* Original Price */}
+      <div>
+        <label htmlFor="originalPrice" className="block text-sm font-medium text-gray-700 mb-1">
+          Precio original <span className="text-gray-400 font-normal">(opcional)</span>
+        </label>
+        <input
+          id="originalPrice"
+          type="number"
+          value={originalPrice}
+          onChange={(e) => onOriginalPriceChange(e.target.value)}
+          className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none"
+          placeholder="Ej: 15000.00"
+          min="0"
+          step="0.01"
+          disabled={disabled}
+        />
+        <p className="text-xs text-gray-400 mt-1">
+          Si querés mostrar una oferta, poné aquí el precio anterior (se mostrará tachado)
+        </p>
       </div>
 
       {/* Image Upload */}

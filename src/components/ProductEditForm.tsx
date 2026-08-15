@@ -26,6 +26,7 @@ export default function ProductEditForm({ editId }: Props) {
   const [productName, setProductName] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [price, setPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
   const [productDetails, setProductDetails] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -65,6 +66,7 @@ export default function ProductEditForm({ editId }: Props) {
       setProductName(product.name);
       setCategoryId(product.category_id || '');
       setPrice(product.price != null ? product.price.toString() : '');
+      setOriginalPrice(product.original_price != null ? product.original_price.toString() : '');
       setProductDetails(product.details || '');
       setOldImageUrl(product.image_url);
       setImagePreview(product.image_url);
@@ -107,6 +109,11 @@ export default function ProductEditForm({ editId }: Props) {
       return;
     }
 
+    if (originalPrice && price && parseFloat(originalPrice) <= parseFloat(price)) {
+      setFormError('El precio original debe ser mayor que el precio actual.');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -133,6 +140,7 @@ export default function ProductEditForm({ editId }: Props) {
           name: productName.trim(),
           category_id: categoryId || null,
           price: price ? parseFloat(price) : null,
+          original_price: originalPrice ? parseFloat(originalPrice) : null,
           details: productDetails.trim() || null,
           image_url: finalImageUrl,
         })
@@ -207,11 +215,13 @@ export default function ProductEditForm({ editId }: Props) {
           productName={productName}
           categoryId={categoryId}
           price={price}
+          originalPrice={originalPrice}
           productDetails={productDetails}
           imagePreview={imagePreview}
           onNameChange={setProductName}
           onCategoryChange={setCategoryId}
           onPriceChange={setPrice}
+          onOriginalPriceChange={setOriginalPrice}
           onDetailsChange={setProductDetails}
           onImageChange={handleImageChange}
           disabled={saving}

@@ -8,6 +8,7 @@ interface Product {
   name: string;
   image_url: string | null;
   price: number | null;
+  original_price: number | null;
   categories: { name: string } | null;
 }
 
@@ -83,6 +84,11 @@ const { data: products } = await supabaseAdmin
                     {product.categories.name}
                   </span>
                 )}
+                {product.original_price != null && (
+                  <span class="inline-block bg-hot-light text-hot text-xs px-2 py-0.5 rounded-full mt-1 ml-1">
+                    Oferta
+                  </span>
+                )}
                 {product.price != null && (
                   <p class="text-lg font-bold text-hot mt-1">L {product.price.toFixed(2)}</p>
                 )}
@@ -143,7 +149,14 @@ const { data: products } = await supabaseAdmin
                 </td>
                 <td class="px-4 py-3 text-right">
                   {product.price != null ? (
-                    <span class="font-semibold text-hot text-sm">L {product.price.toFixed(2)}</span>
+                    <div class="flex flex-col items-end gap-0.5">
+                      <span class="font-semibold text-hot text-sm">L {product.price.toFixed(2)}</span>
+                      {product.original_price != null && (
+                        <span class="inline-block bg-hot-light text-hot text-xs px-2 py-0.5 rounded-full">
+                          Oferta
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <span class="text-xs text-gray-400">&mdash;</span>
                   )}

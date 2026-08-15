@@ -6,6 +6,7 @@ export interface Product {
   name: string;
   description: string | null;
   price: number | null;
+  original_price: number | null;
   image_url: string | null;
   categories?: { name: string } | null;
   category_id?: string | null;
@@ -60,9 +61,16 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
           </div>
         </div>
         <div className="mt-auto pt-3 border-t border-gray-100 space-y-2">
-          <span className="text-xl font-bold text-hot block">
-            {formatPrice(product.price, currency)}
-          </span>
+          <div className="flex flex-col">
+            {product.original_price != null && product.original_price > (product.price ?? 0) && (
+              <span className="text-sm text-gray-400 line-through">
+                {formatPrice(product.original_price, currency)}
+              </span>
+            )}
+            <span className="text-xl font-bold text-hot block">
+              {formatPrice(product.price, currency)}
+            </span>
+          </div>
           <CartQuantityButton
             productId={product.id}
             productName={product.name}

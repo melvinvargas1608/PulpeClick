@@ -27,6 +27,7 @@ export default function ProductCreateForm() {
   const [productName, setProductName] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [price, setPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
   const [productDetails, setProductDetails] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -177,6 +178,11 @@ export default function ProductCreateForm() {
       return;
     }
 
+    if (originalPrice && price && parseFloat(originalPrice) <= parseFloat(price)) {
+      setSaveError('El precio original debe ser mayor que el precio actual.');
+      return;
+    }
+
     setSaving(true);
     setSaveError('');
 
@@ -190,6 +196,7 @@ export default function ProductCreateForm() {
           name: productName.trim(),
           description: description || null,
           price: suggestedPrice || null,
+          original_price: originalPrice ? parseFloat(originalPrice) : null,
           category_id: categoryId || null,
           image_url: imageUrl,
           details: productDetails.trim() || null,
@@ -217,6 +224,7 @@ export default function ProductCreateForm() {
     setProductName('');
     setCategoryId('');
     setPrice('');
+    setOriginalPrice('');
     setProductDetails('');
     setImageFile(null);
     setImagePreview(null);
@@ -259,11 +267,13 @@ export default function ProductCreateForm() {
             productName={productName}
             categoryId={categoryId}
             price={price}
+            originalPrice={originalPrice}
             productDetails={productDetails}
             imagePreview={imagePreview}
             onNameChange={setProductName}
             onCategoryChange={setCategoryId}
             onPriceChange={setPrice}
+            onOriginalPriceChange={setOriginalPrice}
             onDetailsChange={setProductDetails}
             onImageChange={handleImageChange}
             disabled={generating}

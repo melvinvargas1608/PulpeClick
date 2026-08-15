@@ -54,6 +54,7 @@ export interface Database {
           name: string
           description: string | null
           price: number | null
+          original_price: number | null
           image_url: string | null
           category_id: string | null
           details: string | null
@@ -66,6 +67,7 @@ export interface Database {
           name: string
           description?: string | null
           price?: number | null
+          original_price?: number | null
           image_url?: string | null
           category_id?: string | null
           details?: string | null
@@ -78,6 +80,7 @@ export interface Database {
           name?: string
           description?: string | null
           price?: number | null
+          original_price?: number | null
           image_url?: string | null
           category_id?: string | null
           details?: string | null
