@@ -49,6 +49,7 @@ export default function SellerForm() {
     setPhone(data.phone || '')
     setSlug(data.slug)
     setBannerUrl(data.banner_url || null)
+    setBannerPreview(data.banner_url || null)
     const savedCountry = data.country || 'Honduras'
     setCountry(COUNTRY_OPTIONS.includes(savedCountry as typeof COUNTRY_OPTIONS[number]) ? savedCountry : 'Otro')
     if (!COUNTRY_OPTIONS.includes(savedCountry as typeof COUNTRY_OPTIONS[number])) {
