@@ -23,7 +23,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
-        <div className="relative aspect-square w-full overflow-hidden p-3 group bg-gray-50">
+        <div className="relative aspect-square w-full overflow-hidden p-2 group bg-gray-50">
           <img
             src={product.image_url}
             alt={product.name}
@@ -42,7 +42,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
           )}
         </div>
       )}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-3 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 mb-1 truncate">
@@ -54,13 +54,13 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
               </span>
             )}
             {product.description && (
-              <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                 {product.description}
               </p>
             )}
           </div>
         </div>
-        <div className="mt-auto pt-3 border-t border-gray-100 space-y-2">
+        <div className="mt-auto pt-2 border-t border-gray-100 space-y-1.5">
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-bold text-hot">
               {formatPrice(product.price, currency)}
