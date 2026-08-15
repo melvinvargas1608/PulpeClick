@@ -36,6 +36,8 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
 
   const hasActiveFilters = selectedCategory !== '' || searchQuery !== '';
 
+  const hasAnyProducts = newProducts.length > 0 || bestSellers.length > 0 || products.length > 0;
+
   const currency = getCurrencySymbol(country);
 
   const whatsappMessage = '¡Hola! Vi tu catálogo en PulpeClick. Quiero hacer una consulta.';
@@ -127,15 +129,19 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
               <ProductCard key={product.id} product={product} currency={currency} />
             ))}
           </div>
-        ) : (
+        ) : hasActiveFilters ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
             <p className="text-yellow-800 text-sm">
-              {hasActiveFilters
-                ? 'No se encontraron productos con esos filtros.'
-                : 'Este vendedor aún no tiene productos publicados. ¡Volvé pronto!'}
+              No se encontraron productos con esos filtros.
             </p>
           </div>
-        )}
+        ) : !hasAnyProducts ? (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+            <p className="text-yellow-800 text-sm">
+              Este vendedor aún no tiene productos publicados. ¡Volvé pronto!
+            </p>
+          </div>
+        ) : null}
 
         {/* Footer */}
         <div className="mt-8 text-center">
