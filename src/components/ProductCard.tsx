@@ -64,7 +64,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h3
-              className="font-semibold text-gray-900 mb-1 truncate cursor-pointer hover:text-brand transition-colors"
+              className="font-semibold text-gray-900 mb-1 line-clamp-3 cursor-pointer hover:text-brand transition-colors"
               onClick={handleOpen}
               role="button"
               tabIndex={0}
