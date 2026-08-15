@@ -26,6 +26,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
   const handleOpen = () => onProductClick?.(product);
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleOpen();
@@ -42,22 +43,20 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
     : 0;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+    <div
+      className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col cursor-pointer"
+      onClick={handleOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-label={`Ver detalle de ${product.name}`}
+    >
       {product.image_url && (
-        <div
-          className="relative aspect-square w-full overflow-hidden p-2 group bg-gray-50 cursor-pointer"
-          onClick={handleOpen}
-          role="button"
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          aria-label={`Ver detalle de ${product.name}`}
-        >
+        <div className="relative aspect-square w-full overflow-hidden p-2 bg-gray-50">
           <img
             src={product.image_url}
             alt={product.name}
-            className={`w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105 ${
-              isAvailable ? '' : 'grayscale opacity-60'
-            }`}
+            className={`w-full h-full object-cover rounded-md ${isAvailable ? '' : 'grayscale opacity-60'}`}
             loading="lazy"
           />
           {isBestSeller && (
@@ -75,13 +74,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
       <div className="p-3 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3
-              className="font-semibold text-gray-900 mb-1 line-clamp-3 cursor-pointer hover:text-brand transition-colors"
-              onClick={handleOpen}
-              role="button"
-              tabIndex={0}
-              onKeyDown={handleKeyDown}
-            >
+            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-3">
               {product.name}
             </h3>
           </div>
@@ -112,13 +105,15 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
             </span>
           </div>
 
-          <CartQuantityButton
-            productId={product.id}
-            productName={product.name}
-            price={product.price || 0}
-            imageUrl={product.image_url}
-            isAvailable={isAvailable}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <CartQuantityButton
+              productId={product.id}
+              productName={product.name}
+              price={product.price || 0}
+              imageUrl={product.image_url}
+              isAvailable={isAvailable}
+            />
+          </div>
         </div>
       </div>
     </div>
