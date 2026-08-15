@@ -79,13 +79,8 @@ const { data: products } = await supabaseAdmin
               )}
               <div class="flex-1 min-w-0">
                 <h3 class="font-semibold text-gray-900 truncate">{product.name}</h3>
-                {product.categories?.name && (
-                  <span class="inline-block bg-brand-light text-brand text-xs px-2 py-0.5 rounded-full mt-1">
-                    {product.categories.name}
-                  </span>
-                )}
                 {product.original_price != null && (
-                  <span class="inline-block bg-hot-light text-hot text-xs px-2 py-0.5 rounded-full mt-1 ml-1">
+                  <span class="inline-block bg-hot-light text-hot text-xs px-2 py-0.5 rounded-full mt-1">
                     Oferta
                   </span>
                 )}

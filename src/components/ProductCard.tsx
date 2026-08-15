@@ -48,11 +48,6 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
             <h3 className="font-semibold text-gray-900 mb-1 truncate">
               {product.name}
             </h3>
-            {product.categories?.name && (
-              <span className="inline-block bg-brand-light text-brand text-xs px-2 py-0.5 rounded-full mb-2">
-                {product.categories.name}
-              </span>
-            )}
             {product.description && (
               <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                 {product.description}
