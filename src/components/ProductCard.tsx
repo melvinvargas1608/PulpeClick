@@ -59,8 +59,8 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
             )}
           </div>
         </div>
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
-          <span className="text-xl font-bold text-hot">
+        <div className="mt-auto pt-3 border-t border-gray-100 space-y-2">
+          <span className="text-xl font-bold text-hot block">
             {formatPrice(product.price, currency)}
           </span>
           <CartQuantityButton
