@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import CartProvider from './CartProvider';
 import CartNavbar from './CartNavbar';
 import CartDrawer from './CartDrawer';
+import ProductDetailModal from './ProductDetailModal';
 import WhatsAppIcon from './icons/WhatsAppIcon';
 import ProductCard, { type Product } from './ProductCard';
 import { getCurrencySymbol } from '../lib/countryFlags';
@@ -28,6 +29,8 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const PRODUCTS_PER_PAGE = 20;
 
@@ -68,6 +71,23 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const openProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setModalOpen(true);
+  };
+
+  const closeProduct = () => {
+    setModalOpen(false);
+  };
+
+  // Clear the selected product once the closing animation finishes
+  useEffect(() => {
+    if (!modalOpen && selectedProduct) {
+      const t = setTimeout(() => setSelectedProduct(null), 300);
+      return () => clearTimeout(t);
+    }
+  }, [modalOpen, selectedProduct]);
 
   return (
     <>
@@ -131,6 +151,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
                   currency={currency}
                   isNew={newProductIdSet.has(product.id)}
                   isBestSeller={bestSellerIdSet.has(product.id)}
+                  onProductClick={openProduct}
                 />
               ))}
             </div>
@@ -211,6 +232,13 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         sellerId={sellerId}
         sellerName={sellerName}
         whatsappUrl={whatsappUrl}
+        currency={currency}
+      />
+
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={modalOpen}
+        onClose={closeProduct}
         currency={currency}
       />
     </>

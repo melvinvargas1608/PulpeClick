@@ -1,3 +1,4 @@
+import { type KeyboardEvent } from 'react';
 import CartQuantityButton from './CartQuantityButton';
 import { formatPrice } from '../lib/format';
 
@@ -17,13 +18,30 @@ interface Props {
   currency: string;
   isNew?: boolean;
   isBestSeller?: boolean;
+  onProductClick?: (product: Product) => void;
 }
 
-export default function ProductCard({ product, currency, isNew = false, isBestSeller = false }: Props) {
+export default function ProductCard({ product, currency, isNew = false, isBestSeller = false, onProductClick }: Props) {
+  const handleOpen = () => onProductClick?.(product);
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleOpen();
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
-        <div className="relative aspect-square w-full overflow-hidden p-2 group bg-gray-50">
+        <div
+          className="relative aspect-square w-full overflow-hidden p-2 group bg-gray-50 cursor-pointer"
+          onClick={handleOpen}
+          role="button"
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          aria-label={`Ver detalle de ${product.name}`}
+        >
           <img
             src={product.image_url}
             alt={product.name}
@@ -45,14 +63,15 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
       <div className="p-3 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 mb-1 truncate">
+            <h3
+              className="font-semibold text-gray-900 mb-1 truncate cursor-pointer hover:text-brand transition-colors"
+              onClick={handleOpen}
+              role="button"
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+            >
               {product.name}
             </h3>
-            {product.description && (
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                {product.description}
-              </p>
-            )}
           </div>
         </div>
         <div className="mt-auto pt-2 border-t border-gray-100 space-y-1.5">

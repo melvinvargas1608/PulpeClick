@@ -1,0 +1,146 @@
+import { useEffect } from 'react';
+import { type Product } from './ProductCard';
+import { formatPrice } from '../lib/format';
+import CartQuantityButton from './CartQuantityButton';
+import CloseIcon from './icons/CloseIcon';
+
+interface Props {
+  product: Product | null;
+  isOpen: boolean;
+  onClose: () => void;
+  currency: string;
+}
+
+export default function ProductDetailModal({ product, isOpen, onClose, currency }: Props) {
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isOpen, onClose]);
+
+  // Lock body scroll while open
+  useEffect(() => {
+    if (!isOpen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [isOpen]);
+
+  const hasOffer = product != null && product.original_price != null && product.original_price > (product.price ?? 0);
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
+          isOpen ? '' : 'pointer-events-none'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={product?.name ?? 'Detalle del producto'}
+      >
+        <div
+          className={`bg-white w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
+            isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          }`}
+        >
+          {product && (
+            <>
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+                <h2 className="text-lg font-bold text-gray-900 truncate pr-2">
+                  {product.name}
+                </h2>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100 shrink-0"
+                  aria-label="Cerrar"
+                >
+                  <CloseIcon size={20} />
+                </button>
+              </div>
+
+              {/* Body — scrollable */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="flex flex-col md:flex-row">
+                  {/* Image */}
+                  <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center shrink-0">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-64 sm:h-80 md:h-auto md:max-h-[70vh] object-contain"
+                      />
+                    ) : (
+                      <div className="w-full h-64 sm:h-80 flex items-center justify-center text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="w-full md:w-1/2 p-5 sm:p-6 flex flex-col">
+                    {/* Price */}
+                    <div className="flex items-baseline gap-3 mb-3">
+                      <span className="text-2xl sm:text-3xl font-bold text-hot">
+                        {formatPrice(product.price, currency)}
+                      </span>
+                      {hasOffer && (
+                        <span className="text-base text-gray-400 line-through">
+                          {formatPrice(product.original_price, currency)}
+                        </span>
+                      )}
+                    </div>
+
+                    {hasOffer && (
+                      <span className="inline-block self-start bg-hot-light text-hot text-xs font-semibold px-2 py-0.5 rounded-full mb-3">
+                        Oferta
+                      </span>
+                    )}
+
+                    {/* Description */}
+                    {product.description && (
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">
+                        {product.description}
+                      </p>
+                    )}
+
+                    {/* Add to cart */}
+                    <div className="mt-auto pt-4">
+                      <CartQuantityButton
+                        productId={product.id}
+                        productName={product.name}
+                        price={product.price || 0}
+                        imageUrl={product.image_url}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
