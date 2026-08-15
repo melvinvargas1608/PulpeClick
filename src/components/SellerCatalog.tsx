@@ -109,7 +109,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 {product.image_url && (
-                  <div className="aspect-square w-full overflow-hidden p-3 group">
+                  <div className="aspect-square w-full overflow-hidden p-3 group bg-gray-100">
                     <img
                       src={product.image_url}
                       alt={product.name}
