@@ -21,13 +21,13 @@ interface Props {
 
 export default function ProductCard({ product, currency, isNew = false, isBestSeller = false }: Props) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+    <div className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
         <div className="relative aspect-square w-full overflow-hidden p-2 group bg-gray-50">
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
           {isBestSeller && (
