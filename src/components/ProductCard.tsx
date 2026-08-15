@@ -22,7 +22,7 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
-        <div className="relative aspect-square w-full overflow-hidden p-3 group bg-gray-100">
+        <div className="relative aspect-square w-full overflow-hidden p-3 group bg-gray-50">
           <img
             src={product.image_url}
             alt={product.name}
