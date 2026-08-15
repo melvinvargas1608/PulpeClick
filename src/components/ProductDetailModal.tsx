@@ -55,26 +55,21 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
         aria-label={product?.name ?? 'Detalle del producto'}
       >
         <div
-          className={`bg-white w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
+          className={`relative bg-white w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col transition-all duration-300 ${
             isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
           }`}
         >
           {product && (
             <>
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
-                <h2 className="text-lg font-bold text-gray-900 truncate pr-2">
-                  {product.name}
-                </h2>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100 shrink-0"
-                  aria-label="Cerrar"
-                >
-                  <CloseIcon size={20} />
-                </button>
-              </div>
+              {/* Floating close button */}
+              <button
+                type="button"
+                onClick={onClose}
+                className="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-md text-gray-500 hover:text-gray-800 hover:bg-white transition-colors"
+                aria-label="Cerrar"
+              >
+                <CloseIcon size={20} />
+              </button>
 
               {/* Body — scrollable */}
               <div className="flex-1 overflow-y-auto">
@@ -100,33 +95,37 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
 
                   {/* Info */}
                   <div className="w-full md:w-1/2 p-5 sm:p-6 flex flex-col">
-                    {/* Price */}
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <span className="text-2xl sm:text-3xl font-bold text-hot">
-                        {formatPrice(product.price, currency)}
-                      </span>
-                      {hasOffer && (
-                        <span className="text-base text-gray-400 line-through">
-                          {formatPrice(product.original_price, currency)}
-                        </span>
-                      )}
-                    </div>
-
-                    {hasOffer && (
-                      <span className="inline-block self-start bg-hot-light text-hot text-xs font-semibold px-2 py-0.5 rounded-full mb-3">
-                        Oferta
-                      </span>
-                    )}
+                    {/* Name */}
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 pr-8">
+                      {product.name}
+                    </h2>
 
                     {/* Description */}
                     {product.description && (
-                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line mb-4">
                         {product.description}
                       </p>
                     )}
 
-                    {/* Add to cart */}
-                    <div className="mt-auto pt-4">
+                    {/* Price + Add to cart */}
+                    <div className="mt-auto pt-4 border-t border-gray-100">
+                      <div className="flex items-baseline gap-3 mb-2">
+                        <span className="text-2xl sm:text-3xl font-bold text-hot">
+                          {formatPrice(product.price, currency)}
+                        </span>
+                        {hasOffer && (
+                          <span className="text-base text-gray-400 line-through">
+                            {formatPrice(product.original_price, currency)}
+                          </span>
+                        )}
+                      </div>
+
+                      {hasOffer && (
+                        <span className="inline-block bg-hot-light text-hot text-xs font-semibold px-2 py-0.5 rounded-full mb-3">
+                          Oferta
+                        </span>
+                      )}
+
                       <CartQuantityButton
                         productId={product.id}
                         productName={product.name}
