@@ -114,6 +114,8 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
               isAvailable={isAvailable}
             />
           </div>
+
+          <p className="text-xs text-gray-400 text-center">Más detalle →</p>
         </div>
       </div>
     </div>
