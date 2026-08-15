@@ -80,19 +80,17 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
           </div>
         </div>
         <div className="mt-auto pt-2 border-t border-gray-100 space-y-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-baseline gap-1.5 flex-wrap">
-              <span className="text-xl font-bold text-hot whitespace-nowrap">
-                {formatPrice(product.price, currency)}
-              </span>
-              {hasDiscount && (
-                <span className="text-sm text-gray-400 line-through whitespace-nowrap">
-                  {formatPrice(product.original_price, currency)}
-                </span>
-              )}
-            </div>
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-xl font-bold text-hot whitespace-nowrap">
+              {formatPrice(product.price, currency)}
+            </span>
             {hasDiscount && (
-              <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full shrink-0">
+              <span className="text-sm text-gray-400 line-through whitespace-nowrap">
+                {formatPrice(product.original_price, currency)}
+              </span>
+            )}
+            {hasDiscount && (
+              <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full">
                 -{discountPercent}%
               </span>
             )}
