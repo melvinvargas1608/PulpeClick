@@ -2,20 +2,9 @@ import { useState } from 'react';
 import CartProvider from './CartProvider';
 import CartNavbar from './CartNavbar';
 import CartDrawer from './CartDrawer';
-import CartQuantityButton from './CartQuantityButton';
 import WhatsAppIcon from './icons/WhatsAppIcon';
-import { formatPrice } from '../lib/format';
+import ProductCard, { type Product } from './ProductCard';
 import { getCurrencySymbol } from '../lib/countryFlags';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number | null;
-  image_url: string | null;
-  categories?: { name: string } | null;
-  category_id?: string | null;
-}
 
 interface Category {
   id: string;
@@ -29,10 +18,12 @@ interface Props {
   bannerUrl?: string | null;
   country: string;
   products: Product[];
+  newProducts: Product[];
+  bestSellers: Product[];
   categories: Category[];
 }
 
-function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, categories }: Props) {
+function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProducts, bestSellers, categories }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -81,6 +72,35 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
           </div>
         )}
 
+        {/* Novedades — carrusel horizontal de productos recientes */}
+        {newProducts.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Lo más nuevo</h2>
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory -mx-2 px-2">
+              {newProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="snap-start shrink-0 w-56 sm:w-64"
+                >
+                  <ProductCard product={product} currency={currency} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Destacados — top más vendidos */}
+        {bestSellers.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">Los más vendidos</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {bestSellers.map((product) => (
+                <ProductCard key={product.id} product={product} currency={currency} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Resultados de búsqueda */}
         {hasActiveFilters && (
           <div className="mb-4 flex items-center justify-between">
@@ -104,51 +124,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {filtered.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                {product.image_url && (
-                  <div className="aspect-square w-full overflow-hidden p-3 group bg-gray-100">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 mb-1 truncate">
-                        {product.name}
-                      </h3>
-                      {product.categories?.name && (
-                        <span className="inline-block bg-brand-light text-brand text-xs px-2 py-0.5 rounded-full mb-2">
-                          {product.categories.name}
-                        </span>
-                      )}
-                      {product.description && (
-                        <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                          {product.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                    <span className="text-xl font-bold text-hot">
-                      {formatPrice(product.price, currency)}
-                    </span>
-                    <CartQuantityButton
-                      productId={product.id}
-                      productName={product.name}
-                      price={product.price || 0}
-                      imageUrl={product.image_url}
-                    />
-                  </div>
-                </div>
-              </div>
+              <ProductCard key={product.id} product={product} currency={currency} />
             ))}
           </div>
         ) : (
@@ -191,7 +167,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   );
 }
 
-export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, categories }: Props) {
+export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, bannerUrl, country, products, newProducts, bestSellers, categories }: Props) {
   return (
     <CartProvider>
       <SellerCatalogContent
@@ -201,6 +177,8 @@ export default function SellerCatalog({ sellerName, sellerId, whatsappUrl, banne
         bannerUrl={bannerUrl}
         country={country}
         products={products}
+        newProducts={newProducts}
+        bestSellers={bestSellers}
         categories={categories}
       />
     </CartProvider>
