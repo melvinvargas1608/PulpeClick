@@ -84,24 +84,24 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
 
       {/* Row 3: Price (always at bottom) */}
       <div className="px-3 pb-3 pt-2 border-t border-gray-100 space-y-1.5">
-        {/* Price + strikethrough */}
-        <div className="flex items-baseline gap-1.5 flex-wrap">
+        {/* Sale price only — always same height */}
+        <div className="flex items-center">
           <span className="text-xl font-bold text-hot whitespace-nowrap">
             {formatPrice(product.price, currency)}
           </span>
-          {hasDiscount && (
-            <span className="text-sm text-gray-400 line-through whitespace-nowrap">
-              {formatPrice(product.original_price, currency)}
-            </span>
-          )}
         </div>
 
-        {/* Discount badge row — always reserves space for consistent height */}
-        <div className="min-h-[1.25rem]">
+        {/* Original price + discount badge — fixed height row */}
+        <div className="min-h-[1.25rem] flex items-center gap-2">
           {hasDiscount && (
-            <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-              -{discountPercent}%
-            </span>
+            <>
+              <span className="text-sm text-gray-400 line-through whitespace-nowrap">
+                {formatPrice(product.original_price, currency)}
+              </span>
+              <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                -{discountPercent}%
+              </span>
+            </>
           )}
         </div>
 
