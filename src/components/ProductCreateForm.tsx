@@ -32,6 +32,7 @@ export default function ProductCreateForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [isAvailable, setIsAvailable] = useState(true);
   const [formError, setFormError] = useState('');
 
   // AI generation state
@@ -200,6 +201,7 @@ export default function ProductCreateForm() {
           category_id: categoryId || null,
           image_url: imageUrl,
           details: productDetails.trim() || null,
+          is_available: isAvailable,
         })
         .select('id')
         .single();
@@ -229,6 +231,7 @@ export default function ProductCreateForm() {
     setImageFile(null);
     setImagePreview(null);
     setUploadedImageUrl(null);
+    setIsAvailable(true);
     setDescription('');
     setSuggestedPrice(null);
     setSaved(false);
@@ -270,12 +273,14 @@ export default function ProductCreateForm() {
             originalPrice={originalPrice}
             productDetails={productDetails}
             imagePreview={imagePreview}
+            isAvailable={isAvailable}
             onNameChange={setProductName}
             onCategoryChange={setCategoryId}
             onPriceChange={setPrice}
             onOriginalPriceChange={setOriginalPrice}
             onDetailsChange={setProductDetails}
             onImageChange={handleImageChange}
+            onAvailabilityChange={setIsAvailable}
             disabled={generating}
             showPriceHint
           />

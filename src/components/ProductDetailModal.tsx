@@ -33,6 +33,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
   }, [isOpen]);
 
   const hasOffer = product != null && product.original_price != null && product.original_price > (product.price ?? 0);
+  const isAvailable = product?.is_available !== false;
+  const discountPercent = hasOffer
+    ? Math.round(((product!.original_price! - (product!.price ?? 0)) / product!.original_price!) * 100)
+    : 0;
 
   return (
     <>
@@ -80,7 +84,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                       <img
                         src={product.image_url}
                         alt={product.name}
-                        className="w-full h-64 sm:h-80 md:h-auto md:max-h-[70vh] object-contain"
+                        className={`w-full h-64 sm:h-80 md:h-auto md:max-h-[70vh] object-contain ${isAvailable ? '' : 'grayscale opacity-60'}`}
                       />
                     ) : (
                       <div className="w-full h-64 sm:h-80 flex items-center justify-center text-gray-300">
@@ -118,6 +122,11 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                             {formatPrice(product.original_price, currency)}
                           </span>
                         )}
+                        {hasOffer && (
+                          <span className="text-sm font-bold text-white bg-green-500 px-2 py-0.5 rounded-full">
+                            -{discountPercent}%
+                          </span>
+                        )}
                       </div>
 
                       {hasOffer && (
@@ -126,11 +135,19 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                         </span>
                       )}
 
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <span className={`text-sm font-medium ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
+                          {isAvailable ? 'En stock' : 'Agotado'}
+                        </span>
+                      </div>
+
                       <CartQuantityButton
                         productId={product.id}
                         productName={product.name}
                         price={product.price || 0}
                         imageUrl={product.image_url}
+                        isAvailable={isAvailable}
                       />
                     </div>
                   </div>

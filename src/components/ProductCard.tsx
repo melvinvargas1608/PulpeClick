@@ -11,6 +11,7 @@ export interface Product {
   image_url: string | null;
   categories?: { name: string } | null;
   category_id?: string | null;
+  is_available?: boolean;
 }
 
 interface Props {
@@ -31,6 +32,15 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
     }
   };
 
+  const isAvailable = product.is_available !== false;
+  const hasDiscount =
+    product.original_price != null &&
+    product.price != null &&
+    product.original_price > product.price;
+  const discountPercent = hasDiscount
+    ? Math.round(((product.original_price! - product.price!) / product.original_price!) * 100)
+    : 0;
+
   return (
     <div className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
       {product.image_url && (
@@ -45,7 +55,9 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
+            className={`w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105 ${
+              isAvailable ? '' : 'grayscale opacity-60'
+            }`}
             loading="lazy"
           />
           {isBestSeller && (
@@ -75,21 +87,37 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
           </div>
         </div>
         <div className="mt-auto pt-2 border-t border-gray-100 space-y-1.5">
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-bold text-hot">
-              {formatPrice(product.price, currency)}
-            </span>
-            {product.original_price != null && product.original_price > (product.price ?? 0) && (
-              <span className="text-sm text-gray-400 line-through">
-                {formatPrice(product.original_price, currency)}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className="text-xl font-bold text-hot">
+                {formatPrice(product.price, currency)}
+              </span>
+              {hasDiscount && (
+                <span className="text-sm text-gray-400 line-through">
+                  {formatPrice(product.original_price, currency)}
+                </span>
+              )}
+            </div>
+            {hasDiscount && (
+              <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full shrink-0">
+                -{discountPercent}%
               </span>
             )}
           </div>
+
+          <div className="flex items-center gap-1.5">
+            <span className={`h-2 w-2 rounded-full shrink-0 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
+            <span className={`text-xs ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
+              {isAvailable ? 'En stock' : 'Agotado'}
+            </span>
+          </div>
+
           <CartQuantityButton
             productId={product.id}
             productName={product.name}
             price={product.price || 0}
             imageUrl={product.image_url}
+            isAvailable={isAvailable}
           />
         </div>
       </div>

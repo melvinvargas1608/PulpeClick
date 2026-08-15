@@ -8,6 +8,7 @@ export interface ProductFieldsData {
   originalPrice: string;
   productDetails: string;
   imagePreview: string | null;
+  isAvailable: boolean;
 }
 
 interface ProductBasicFieldsProps extends ProductFieldsData {
@@ -17,6 +18,7 @@ interface ProductBasicFieldsProps extends ProductFieldsData {
   onOriginalPriceChange: (value: string) => void;
   onDetailsChange: (value: string) => void;
   onImageChange: (file: File | null, preview: string | null) => void;
+  onAvailabilityChange: (value: boolean) => void;
   disabled?: boolean;
   showPriceHint?: boolean;
 }
@@ -28,12 +30,14 @@ export default function ProductBasicFields({
   originalPrice,
   productDetails,
   imagePreview,
+  isAvailable,
   onNameChange,
   onCategoryChange,
   onPriceChange,
   onOriginalPriceChange,
   onDetailsChange,
   onImageChange,
+  onAvailabilityChange,
   disabled = false,
   showPriceHint = true,
 }: ProductBasicFieldsProps) {
@@ -146,6 +150,33 @@ export default function ProductBasicFields({
         onImageChange={onImageChange}
         disabled={disabled}
       />
+
+      {/* Availability */}
+      <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+        <div>
+          <p className="text-sm font-medium text-gray-700">Disponibilidad</p>
+          <p className="text-xs text-gray-400">
+            {isAvailable ? 'El producto se muestra disponible en el catálogo' : 'El producto se muestra como agotado'}
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={isAvailable}
+          aria-label="Disponibilidad"
+          onClick={() => onAvailabilityChange(!isAvailable)}
+          disabled={disabled}
+          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+            isAvailable ? 'bg-brand' : 'bg-gray-300'
+          } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              isAvailable ? 'translate-x-6' : 'translate-x-1'
+            }`}
+          />
+        </button>
+      </div>
     </>
   );
 }

@@ -31,6 +31,7 @@ export default function ProductEditForm({ editId }: Props) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [oldImageUrl, setOldImageUrl] = useState<string | null>(null);
+  const [isAvailable, setIsAvailable] = useState(true);
   const [formError, setFormError] = useState('');
 
   // Save state
@@ -70,6 +71,7 @@ export default function ProductEditForm({ editId }: Props) {
       setProductDetails(product.details || '');
       setOldImageUrl(product.image_url);
       setImagePreview(product.image_url);
+      setIsAvailable(product.is_available !== false);
 
       // Fetch seller info
       const { data: sellerData } = await supabaseClient
@@ -143,6 +145,7 @@ export default function ProductEditForm({ editId }: Props) {
           original_price: originalPrice ? parseFloat(originalPrice) : null,
           details: productDetails.trim() || null,
           image_url: finalImageUrl,
+          is_available: isAvailable,
         })
         .eq('id', editId);
 
@@ -218,12 +221,14 @@ export default function ProductEditForm({ editId }: Props) {
           originalPrice={originalPrice}
           productDetails={productDetails}
           imagePreview={imagePreview}
+          isAvailable={isAvailable}
           onNameChange={setProductName}
           onCategoryChange={setCategoryId}
           onPriceChange={setPrice}
           onOriginalPriceChange={setOriginalPrice}
           onDetailsChange={setProductDetails}
           onImageChange={handleImageChange}
+          onAvailabilityChange={setIsAvailable}
           disabled={saving}
           showPriceHint={false}
         />

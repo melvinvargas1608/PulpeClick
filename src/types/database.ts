@@ -58,6 +58,7 @@ export interface Database {
           image_url: string | null
           category_id: string | null
           details: string | null
+          is_available: boolean
           created_at: string
           updated_at: string
         }
@@ -71,6 +72,7 @@ export interface Database {
           image_url?: string | null
           category_id?: string | null
           details?: string | null
+          is_available?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -84,6 +86,7 @@ export interface Database {
           image_url?: string | null
           category_id?: string | null
           details?: string | null
+          is_available?: boolean
           created_at?: string
           updated_at?: string
         }
