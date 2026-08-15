@@ -113,17 +113,17 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
 
                     {/* Price + Add to cart */}
                     <div className="mt-auto pt-4 border-t border-gray-100">
-                      <div className="flex items-baseline gap-3 mb-2">
-                        <span className="text-2xl sm:text-3xl font-bold text-hot">
+                      <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                        <span className="text-2xl sm:text-3xl font-bold text-hot whitespace-nowrap">
                           {formatPrice(product.price, currency)}
                         </span>
                         {hasOffer && (
-                          <span className="text-base text-gray-400 line-through">
+                          <span className="text-base text-gray-400 line-through whitespace-nowrap">
                             {formatPrice(product.original_price, currency)}
                           </span>
                         )}
                         {hasOffer && (
-                          <span className="text-sm font-bold text-white bg-green-500 px-2 py-0.5 rounded-full">
+                          <span className="text-sm font-bold text-white bg-green-500 px-2 py-0.5 rounded-full whitespace-nowrap">
                             -{discountPercent}%
                           </span>
                         )}
