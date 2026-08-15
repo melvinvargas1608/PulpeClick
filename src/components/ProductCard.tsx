@@ -44,83 +44,85 @@ export default function ProductCard({ product, currency, isNew = false, isBestSe
 
   return (
     <div
-      className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full flex flex-col cursor-pointer"
+      className="bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow h-full grid grid-rows-[auto_1fr_auto] cursor-pointer"
       onClick={handleOpen}
       role="button"
       tabIndex={0}
       onKeyDown={handleKeyDown}
       aria-label={`Ver detalle de ${product.name}`}
     >
-      {product.image_url && (
-        <div className="relative aspect-square w-full overflow-hidden p-2 bg-gray-50">
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className={`w-full h-full object-cover rounded-md ${isAvailable ? '' : 'grayscale opacity-60'}`}
-            loading="lazy"
-          />
-          {isBestSeller && (
-            <span className="absolute top-2 left-2 bg-hot text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-              Más vendido
-            </span>
-          )}
-          {isNew && (
-            <span className="absolute top-2 right-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
-              Nuevo
-            </span>
-          )}
-        </div>
-      )}
-      <div className="p-3 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-3">
-              {product.name}
-            </h3>
-          </div>
-        </div>
-        <div className="flex-1" />
-        <div className="pt-2 border-t border-gray-100 space-y-1.5">
-          {/* Price + strikethrough */}
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-xl font-bold text-hot whitespace-nowrap">
-              {formatPrice(product.price, currency)}
-            </span>
-            {hasDiscount && (
-              <span className="text-sm text-gray-400 line-through whitespace-nowrap">
-                {formatPrice(product.original_price, currency)}
-              </span>
-            )}
-          </div>
-
-          {/* Discount badge row — always reserves space for consistent height */}
-          <div className="min-h-[1.25rem]">
-            {hasDiscount && (
-              <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full whitespace-nowrap">
-                -{discountPercent}%
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <span className={`h-2 w-2 rounded-full shrink-0 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
-            <span className={`text-xs ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
-              {isAvailable ? 'En stock' : 'Agotado'}
-            </span>
-          </div>
-
-          <div onClick={(e) => e.stopPropagation()}>
-            <CartQuantityButton
-              productId={product.id}
-              productName={product.name}
-              price={product.price || 0}
-              imageUrl={product.image_url}
-              isAvailable={isAvailable}
+      {/* Row 1: Image */}
+      <div>
+        {product.image_url && (
+          <div className="relative aspect-square w-full overflow-hidden p-2 bg-gray-50">
+            <img
+              src={product.image_url}
+              alt={product.name}
+              className={`w-full h-full object-cover rounded-md ${isAvailable ? '' : 'grayscale opacity-60'}`}
+              loading="lazy"
             />
+            {isBestSeller && (
+              <span className="absolute top-2 left-2 bg-hot text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                Más vendido
+              </span>
+            )}
+            {isNew && (
+              <span className="absolute top-2 right-2 bg-brand text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                Nuevo
+              </span>
+            )}
           </div>
+        )}
+      </div>
 
-          <p className="text-xs text-gray-400 text-center">Más detalle →</p>
+      {/* Row 2: Title (grows with 1fr) */}
+      <div className="px-3 pt-3 min-w-0">
+        <h3 className="font-semibold text-gray-900 line-clamp-3">
+          {product.name}
+        </h3>
+      </div>
+
+      {/* Row 3: Price (always at bottom) */}
+      <div className="px-3 pb-3 pt-2 border-t border-gray-100 space-y-1.5">
+        {/* Price + strikethrough */}
+        <div className="flex items-baseline gap-1.5 flex-wrap">
+          <span className="text-xl font-bold text-hot whitespace-nowrap">
+            {formatPrice(product.price, currency)}
+          </span>
+          {hasDiscount && (
+            <span className="text-sm text-gray-400 line-through whitespace-nowrap">
+              {formatPrice(product.original_price, currency)}
+            </span>
+          )}
         </div>
+
+        {/* Discount badge row — always reserves space for consistent height */}
+        <div className="min-h-[1.25rem]">
+          {hasDiscount && (
+            <span className="text-xs font-bold text-white bg-green-500 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+              -{discountPercent}%
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <span className={`h-2 w-2 rounded-full shrink-0 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
+          <span className={`text-xs ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
+            {isAvailable ? 'En stock' : 'Agotado'}
+          </span>
+        </div>
+
+        <div onClick={(e) => e.stopPropagation()}>
+          <CartQuantityButton
+            productId={product.id}
+            productName={product.name}
+            price={product.price || 0}
+            imageUrl={product.image_url}
+            isAvailable={isAvailable}
+          />
+        </div>
+
+        <p className="text-xs text-gray-400 text-center">Más detalle →</p>
       </div>
     </div>
   );
