@@ -62,24 +62,29 @@ export async function generateContent({ prompt, model = 'gemini-3.5-flash-lite',
   return parseGeminiResponse(data)
 }
 
-export function productDescriptionPrompt(productName: string, category: string, price?: number, details?: string): string {
-  return `Actúa como un redactor de contenido experto en comercio electrónico, especializado en optimización de fichas de producto al estilo Amazon. Vas a escribir la descripción de un producto vendido por un emprendedor en Honduras.
+export function productDescriptionPrompt(productName: string, category: string, price?: number, details?: string, publico?: string): string {
+  return `Actúa como un redactor de contenido experto en comercio electrónico, especializado en optimización de fichas de producto al estilo Amazon. Vas a escribir la sección "Sobre este artículo" de un producto vendido por un emprendedor en Honduras.
 
-Generá entre 3 y 5 viñetas breves, una por línea, sin párrafo introductorio ni texto adicional. Máximo 50 palabras en total.
+Datos del producto:
+Nombre: ${productName}
+Categoría: ${category}
+Características/materiales conocidos: ${details || 'No se proporcionaron'}
+Público objetivo (si aplica): ${publico || 'No se proporcionó'}
+
+Generá entre 3 y 5 viñetas breves, una por línea, sin párrafo introductorio ni texto adicional. Máximo 70 palabras en total.
 
 Pautas:
 - Cada viñeta destaca un beneficio o característica clave del producto.
+- Cuando sea posible, conectá cada característica con un beneficio concreto para el cliente (no solo "qué es", sino "para qué le sirve").
+- Usá SOLO la información proporcionada arriba. Si un dato no fue dado, no lo inventes ni asumas materiales, medidas o funciones que no se mencionaron.
 - Usá frases cortas y directas, con tono profesional, claro y vendedor.
+- Evitá superlativos sin fundamento como "el mejor" o "único en el mercado" a menos que el dato lo respalde.
 - NO uses emojis.
 - NO uses guiones, asteriscos ni ningún símbolo de viñeta (•, -, *). Solo el texto de cada punto en una línea nueva.
 - Escribí en español correcto, con todos los acentos y tildes.
 - NO menciones el precio bajo ninguna circunstancia.
-${details ? '- SÍ usá las notas del vendedor como datos reales del producto: material, tamaño, color, usos específicos.' : '- Describí características concretas: material, tamaño, usos prácticos.'}
 
-Producto: ${productName}
-Categoría: ${category}${details ? `\nNotas del vendedor: ${details}` : ''}
-
-Descripción (viñetas, una por línea):`
+Descripción (3 a 5 viñetas, una por línea):`
 }
 
 export function suggestPricePrompt(productName: string, category: string, description: string): string {
