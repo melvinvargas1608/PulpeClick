@@ -81,8 +81,19 @@ if (categoryIds.length > 0) {
     .order('name');
   categories = cats || [];
 }
+
+// Open Graph: build absolute URLs for social sharing previews
+const ogImage = new URL('/logo-512.png', Astro.url).toString();
+const ogUrl = Astro.url.toString();
+const ogDescription = `Catálogo de productos de ${seller.name}`;
 ---
-<Layout title={seller.name} description={`Catálogo de productos de ${seller.name}`}>
+<Layout
+  title={`${seller.name} | PulpeClick`}
+  description={ogDescription}
+  ogImage={ogImage}
+  ogUrl={ogUrl}
+  ogType="website"
+>
   <SellerCatalog
     sellerName={seller.name}
     sellerId={seller.id}

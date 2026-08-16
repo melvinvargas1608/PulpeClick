@@ -4,6 +4,7 @@ import CartNavbar from './CartNavbar';
 import CartDrawer from './CartDrawer';
 import ProductDetailModal from './ProductDetailModal';
 import WhatsAppIcon from './icons/WhatsAppIcon';
+import ShareIcon from './icons/ShareIcon';
 import ProductCard, { type Product } from './ProductCard';
 import { getCurrencySymbol } from '../lib/countryFlags';
 
@@ -31,6 +32,7 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState(false);
 
   const PRODUCTS_PER_PAGE = 20;
 
@@ -66,6 +68,31 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
   const currency = getCurrencySymbol(country);
 
   const whatsappMessage = '¡Hola! Vi tu catálogo en PulpeClick. Quiero hacer una consulta.';
+
+  const shareCatalog = async () => {
+    const url = window.location.href;
+    const title = `Catálogo de ${sellerName}`;
+
+    // Prefer native share sheet when available (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch (err) {
+        // User cancelled or share failed — fall through to clipboard copy
+        if ((err as Error)?.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: copy the URL to the clipboard
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareFeedback(true);
+      setTimeout(() => setShareFeedback(false), 2000);
+    } catch {
+      // Clipboard unavailable — do nothing harmful
+    }
+  };
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -225,6 +252,24 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         <WhatsAppIcon size={22} />
         <span className="hidden sm:inline text-sm font-semibold">Contactar por WhatsApp</span>
       </a>
+
+      {/* Botón flotante de compartir catálogo */}
+      <button
+        type="button"
+        onClick={shareCatalog}
+        className="fixed bottom-6 left-4 z-40 bg-gray-800 hover:bg-gray-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-2 px-4 py-3 sm:px-5"
+        aria-label="Compartir catálogo"
+      >
+        <ShareIcon size={20} />
+        <span className="hidden sm:inline text-sm font-semibold">Compartir</span>
+      </button>
+
+      {/* Toast de link copiado */}
+      {shareFeedback && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-full shadow-lg">
+          ¡Link copiado!
+        </div>
+      )}
 
       <CartDrawer
         isOpen={drawerOpen}

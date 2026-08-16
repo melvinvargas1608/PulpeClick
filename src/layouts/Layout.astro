@@ -4,8 +4,11 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
+  ogUrl?: string;
+  ogType?: string;
 }
-const { title, description } = Astro.props;
+const { title, description, ogImage, ogUrl, ogType = 'website' } = Astro.props;
 ---
 <!doctype html>
 <html lang="es">
@@ -15,6 +18,15 @@ const { title, description } = Astro.props;
     <meta name="description" content={description || 'Catálogo digital para emprendedores'} />
     <meta name="theme-color" content="#17877f" />
     <meta name="msapplication-TileColor" content="#17877f" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || 'Catálogo digital para emprendedores'} />
+    <meta property="og:type" content={ogType} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogUrl && <meta property="og:url" content={ogUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description || 'Catálogo digital para emprendedores'} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
