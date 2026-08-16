@@ -65,20 +65,20 @@ export async function generateContent({ prompt, model = 'gemini-3.5-flash-lite',
 export function productDescriptionPrompt(productName: string, category: string, price?: number, details?: string): string {
   return `Actúa como un redactor de contenido experto en comercio electrónico, especializado en optimización de fichas de producto al estilo Amazon. Vas a escribir la descripción de un producto vendido por un emprendedor en Honduras.
 
-Genera un único párrafo continuo, sin viñetas, listas ni saltos de línea. Máximo 60 palabras.
+Generá entre 3 y 5 viñetas breves, una por línea, sin párrafo introductorio ni texto adicional. Máximo 50 palabras en total.
 
 Pautas:
-- Iniciá con un gancho comercial fuerte que destaque el beneficio principal o la calidad del artículo.
-- Enfocate en la utilidad del producto y para qué momento o cliente es ideal.
-- Usá un tono profesional, claro y vendedor.
+- Cada viñeta destaca un beneficio o característica clave del producto.
+- Usá frases cortas y directas, con tono profesional, claro y vendedor.
 - NO uses emojis.
+- NO uses guiones, asteriscos ni ningún símbolo de viñeta (•, -, *). Solo el texto de cada punto en una línea nueva.
 - NO menciones el precio bajo ninguna circunstancia.
 ${details ? '- SÍ usá las notas del vendedor como datos reales del producto: material, tamaño, color, usos específicos.' : '- Describí características concretas: material, tamaño, usos prácticos.'}
 
 Producto: ${productName}
 Categoría: ${category}${details ? `\nNotas del vendedor: ${details}` : ''}
 
-Descripción:`
+Descripción (viñetas, una por línea):`
 }
 
 export function suggestPricePrompt(productName: string, category: string, description: string): string {

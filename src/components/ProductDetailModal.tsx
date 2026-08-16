@@ -11,6 +11,22 @@ interface Props {
   currency: string;
 }
 
+// Split a multi-line or comma-separated text into bullet items.
+function splitIntoBullets(text: string | null | undefined): string[] {
+  if (!text) return [];
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  // Prefer newline-separated items; fall back to commas/semicolons.
+  const lines = trimmed.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length > 1) return lines;
+
+  return lines[0]
+    .split(/[,;]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export default function ProductDetailModal({ product, isOpen, onClose, currency }: Props) {
   // Close on Escape
   useEffect(() => {
@@ -37,6 +53,10 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
   const discountPercent = hasOffer
     ? Math.round(((product!.original_price! - (product!.price ?? 0)) / product!.original_price!) * 100)
     : 0;
+
+  const aboutBullets = splitIntoBullets(product?.description);
+  const featureBullets = splitIntoBullets(product?.details);
+  const categoryName = product?.categories?.name ?? null;
 
   return (
     <>
@@ -100,16 +120,72 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                   {/* Info */}
                   <div className="w-full md:w-1/2 p-5 sm:p-6 flex flex-col">
                     {/* Name */}
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 pr-8">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 pr-8">
                       {product.name}
                     </h2>
 
-                    {/* Description */}
-                    {product.description && (
-                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                        {product.description}
-                      </p>
+                    {/* Sobre este artículo */}
+                    {aboutBullets.length > 0 && (
+                      <section className="mb-5">
+                        <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">
+                          Sobre este artículo
+                        </h3>
+                        <ul className="space-y-1.5">
+                          {aboutBullets.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-700 leading-relaxed">
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" aria-hidden="true" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
                     )}
+
+                    {/* Características */}
+                    {featureBullets.length > 0 && (
+                      <section className="mb-5">
+                        <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">
+                          Características
+                        </h3>
+                        <ul className="space-y-1.5">
+                          {featureBullets.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-700 leading-relaxed">
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-hot" aria-hidden="true" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+
+                    {/* Información del producto */}
+                    <section className="mb-5">
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">
+                        Información del producto
+                      </h3>
+                      <dl className="text-sm sm:text-base">
+                        {categoryName && (
+                          <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                            <dt className="text-gray-500">Categoría</dt>
+                            <dd className="text-gray-800 font-medium">{categoryName}</dd>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                          <dt className="text-gray-500">Disponibilidad</dt>
+                          <dd className={`font-medium ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
+                            {isAvailable ? 'En stock' : 'Agotado'}
+                          </dd>
+                        </div>
+                        {hasOffer && (
+                          <div className="flex items-center justify-between py-1.5">
+                            <dt className="text-gray-500">Oferta</dt>
+                            <dd className="font-bold text-white bg-green-500 px-2 py-0.5 rounded-full">
+                              -{discountPercent}%
+                            </dd>
+                          </div>
+                        )}
+                      </dl>
+                    </section>
 
                     {/* Price + Add to cart */}
                     <div className="mt-auto pt-4 border-t border-gray-100">
@@ -134,13 +210,6 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                           Oferta
                         </span>
                       )}
-
-                      <div className="flex items-center gap-1.5 mb-3">
-                        <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
-                        <span className={`text-sm font-medium ${isAvailable ? 'text-green-600' : 'text-gray-500'}`}>
-                          {isAvailable ? 'En stock' : 'Agotado'}
-                        </span>
-                      </div>
 
                       <CartQuantityButton
                         productId={product.id}
