@@ -83,7 +83,7 @@ if (categoryIds.length > 0) {
 }
 
 // Open Graph: build absolute URLs for social sharing previews
-const ogImage = new URL('/logo-512.png', Astro.url).toString();
+const ogImage = new URL('/logo-512.png', Astro.site).toString();
 const ogUrl = Astro.url.toString();
 const ogDescription = `Catálogo de productos de ${seller.name}`;
 ---
