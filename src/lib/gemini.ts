@@ -72,6 +72,7 @@ Pautas:
 - Usá frases cortas y directas, con tono profesional, claro y vendedor.
 - NO uses emojis.
 - NO uses guiones, asteriscos ni ningún símbolo de viñeta (•, -, *). Solo el texto de cada punto en una línea nueva.
+- Escribí en español correcto, con todos los acentos y tildes.
 - NO menciones el precio bajo ninguna circunstancia.
 ${details ? '- SÍ usá las notas del vendedor como datos reales del producto: material, tamaño, color, usos específicos.' : '- Describí características concretas: material, tamaño, usos prácticos.'}
 
