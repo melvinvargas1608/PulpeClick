@@ -18,6 +18,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# gentle-ai local tooling (skill registry, machine-specific paths)
+.atl/
+
 # macOS-specific files
 .DS_Store
 
