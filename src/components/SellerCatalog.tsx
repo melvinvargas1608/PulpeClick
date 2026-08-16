@@ -238,12 +238,6 @@ function SellerCatalogContent({ sellerName, sellerId, whatsappUrl, bannerUrl, co
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-400 mb-2">Catálogo creado con PulpeClick</p>
-          <p className="text-xs text-gray-500">
-            ¿Querés tu propio catálogo?{' '}
-            <a href="mailto:infopulpeclick@gmail.com" className="text-brand hover:underline">
-              infopulpeclick@gmail.com
-            </a>
-          </p>
         </div>
       </div>
 
