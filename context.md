@@ -83,7 +83,7 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 ### Tablas
 
 - **sellers**: vendedores registrados (name, phone, whatsapp_url, slug, banner_url, country, is_active)
-- **products**: productos cargados (seller_id, name, description, price, original_price, image_url, category_id, details)
+- **products**: productos cargados (seller_id, name, description, price, original_price, image_url, category_id, details, is_available)
 - **categories**: categorías de productos (name)
 - **customers**: compradores (name, phone)
 - **orders**: pedidos (seller_id, customer_id, customer_name, customer_phone, total_amount, status)
@@ -115,6 +115,7 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 - `010_add_sellers_country.sql` — columna country en sellers (obligatorio, default Honduras)
 - `009_add_orders_seller_created_at_index.sql` — índice `idx_orders_seller_created_at` para cálculo de "Más vendido" (pedidos últimos 30 días)
 - `010_add_product_original_price.sql` — columna original_price en products (precio original opcional para ofertas, tachado)
+- `011_add_product_is_available.sql` — columna is_available BOOLEAN default true en products (toggle de disponibilidad; el admin lo ajusta a pedido del vendedor por WhatsApp)
 
 ### Storage
 
@@ -148,12 +149,16 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 - Filtros combinados: categoría + nombre. "Limpiar filtros" + contador de resultados
 - **CatalogFilters**: select categorías (`max-w-16 sm:max-w-24`, `px-1`, fondo `#D4D4D4`, texto gris oscuro) + input blanco "Buscar en el catálogo" + botón lupa naranja (`bg-hot`, `rounded-r`). Bordes redondeados 4px (`rounded`/`rounded-l`/`rounded-r`). Foco del input → ring naranja envuelve TODO el filtro. Foco del select → borde naranja `border-2 border-hot` solo en el select (usar `border` no `ring` para evitar desborde debajo del buscador). Línea separadora select/buscador siempre gris (`border-gray-600`)
 - Banner de tienda: si el vendedor tiene banner (Canva, 1920×384px) se muestra solo la imagen. Si no tiene, gradiente verde de marca con nombre centrado + "Catálogo de productos"
-- Grid responsive: 1/2/5 columnas, images 1:1 con object-cover + **zoom hover `scale-105`** (solo la imagen, no la card). Card compactada (padding `p-3`, imagen `p-2`, descripción `line-clamp-2`), esquinas `rounded-md` (6px), fondo de imagen `bg-gray-50`
+- Grid responsive: 2/3/5 columnas (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`), images 1:1 con object-cover (sin zoom). Card compactada (padding `p-3`, imagen `p-2`), esquinas `rounded-md` (6px), fondo de imagen `bg-gray-50`
+- **Card entera clickeable**: abre `ProductDetailModal` (overlay + panel). `CartQuantityButton` envuelto en `stopPropagation()`. Título con `line-clamp-3` + hint "Más detalle →" al final
+- **Estructura interna de la card**: `grid grid-rows-[auto_1fr_auto]` — fila 1 imagen (auto), fila 2 título (1fr absorbe diferencias de alto), fila 3 precio (auto, siempre al fondo). Así el `border-t` queda alineado entre cards con títulos de distinto largo
 - **Badges sobre la imagen**: "Más vendido" (arriba-izquierda, `bg-hot`) = top 20% de productos más vendidos en los últimos 30 días (sin tope máximo). "Nuevo" (arriba-derecha, `bg-brand`) = producto con `created_at` en los últimos 7 días. Ambos dinámicos, se recalculan en cada carga
-- **Precio original**: si `original_price` > `price`, se muestra tachado a la derecha del precio de venta (text-sm gris `line-through`)
-- Botón "Agregar al carrito" ancho completo (`w-full`), verde marca (`bg-brand`), bordes `rounded-full`, debajo del precio
+- **Precio de venta**: solo en su fila (`text-xl font-bold text-hot whitespace-nowrap`). **Precio original tachado**: se muestra en la MISMA fila del badge de descuento (`min-h-[1.25rem] flex items-center`), NO junto al precio de venta — esto evita que el `line-through` desalinee el `border-t`
+- **Badge de descuento**: `-X%` (`bg-green-500`, `rounded-full`) en la fila del precio original. La fila tiene `min-h-[1.25rem]` para reservar altura con o sin descuento
+- **Indicador de stock**: punto verde/gris + "En stock"/"Agotado". Si `is_available` es false, la imagen se ve en `grayscale opacity-60` y el botón se deshabilita con "Agotado"
+- Botón "Agregar" ancho completo (`w-full`), verde marca (`bg-brand`), bordes `rounded-full`, debajo del precio
 - **Paginación cliente**: 20 productos por página, controles abajo de la grilla, reinicio a página 1 al filtrar
-- CartQuantityButton: solo botón "Agregar" (1 unidad) en tarjeta. Una vez en carrito → badge "En carrito". Cantidades se ajustan en el carrito.
+- CartQuantityButton: solo botón "Agregar" (1 unidad) en tarjeta. Una vez en carrito → badge "En carrito". Cantidades se ajustan en el carrito. Recibe `isAvailable` para deshabilitarse.
 - Botón flotante WhatsApp (`bg-hot`, abajo derecha) para contactar al vendedor
 - Footer: "Catálogo creado con PulpeClick"
 ### Carrito y Pedidos
@@ -208,6 +213,7 @@ src/
 │   ├── ProductCreateForm.tsx  # Wizard crear producto (2 pasos + IA)
 │   ├── ProductEditForm.tsx    # Formulario editar producto
 │   ├── ProductForm.tsx        # Wrapper: elige create/edit según editId
+│   ├── ProductDetailModal.tsx # Modal de detalle de producto (overlay + panel responsive)
 │   ├── ProductImageUploader.tsx # Upload de imagen reutilizable
 │   ├── SellerCatalog.tsx      # Catálogo completo (filtros, grid, WhatsApp)
 │   ├── SellerForm.tsx         # Formulario crear/editar vendedor
@@ -309,6 +315,10 @@ pnpm run build        # Build para producción
 41. **Precio original**: columna `original_price` opcional. Se muestra tachado a la derecha del precio si `original_price > price`. Validación en forms: original debe ser mayor que actual. Badge "Oferta" en admin.
 42. **Paginación cliente**: 20 productos por página en SellerCatalog. `useEffect` resetea a página 1 al cambiar filtros, y ajusta la página si los resultados se achican. `goToPage` hace `window.scrollTo` al top.
 43. **Bug de upload**: al cargar datos existentes para editar, setear TANTO `bannerUrl`/`oldImageUrl` COMO `bannerPreview`/`imagePreview`. Si solo se setea la URL y no el preview, el form cree que se removió la imagen y la borra al guardar.
+44. **Alinear `border-t` entre cards**: la causa raíz era el `line-through` del precio original en la MISMA fila flex que el precio de venta con `items-baseline`, generando altura variable. Solución: precio de venta solo en su fila, y precio original + badge en una fila `min-h-[1.25rem]` separada.
+45. **`h-full` en grid item**: interfiere con la resolución del track height del grid padre en mobile. Para que la card interna (`grid-rows-[auto_1fr_auto]`) distribuya bien el `1fr`, NO confiar solo en `h-full` — la fila del título con `1fr` absorbe las diferencias de alto entre títulos.
+46. **Modal de detalle**: overlay con `Escape`, clic fuera, botón flotante X. Panel `flex-col sm:flex-row`. Cierre con animación de 300ms (`setTimeout` para limpiar el producto seleccionado).
+47. **Disponibilidad de producto**: toggle `is_available` en admin (ProductBasicFields, create y edit). El admin lo ajusta a pedido del vendedor por WhatsApp — no hay login de vendedor.
 
 ## Próximos pasos
 
@@ -320,7 +330,47 @@ pnpm run build        # Build para producción
 - ✅ Página 404 custom con logo
 - ✅ Efecto zoom en imágenes del catálogo (scale-105)
 - ✅ Configurar PWA manifest + favicons
+- ✅ Modal de detalle de producto (ProductDetailModal) + card clickeable
+- ✅ Badge de descuento, indicador de stock, toggle de disponibilidad (is_available)
+- ⏳ Aplicar migración `011_add_product_is_available.sql` en Supabase real
 - Probar con vendedores reales
+
+## Términos legales y políticas
+
+Documentos legales del sitio, a nombre de **Melvin Vargas** (emprendimiento personal, sin registro legal formal aún). País: **Honduras**. Contacto legal: **infopulpeclick@gmail.com**.
+
+> **Estado:** redactados pero aún NO linkeados en el footer (las páginas `/terminos.astro` y `/politica-privacidad.astro` no se han creado). El footer global (`Layout.astro`) muestra los textos planos "Términos y Condiciones · Política de Privacidad" como placeholder sin `href`.
+
+### Resumen Política de Privacidad
+
+- **Datos recopilados**: nombre, teléfono, productos seleccionados, info de dispositivo (básica). NO tarjetas, NO historial de navegación externo.
+- **Uso**: enviar pedido al vendedor, contacto por WhatsApp, análisis anónimo.
+- **No vende ni comparte datos** con terceros ajenos al vendedor del pedido.
+- **Cookies**: solo técnicas (carrito) y de sesión admin. Sin tracking/publicidad.
+- **Seguridad**: Supabase, HTTPS, acceso restringido.
+- **Derechos del usuario**: acceso, corrección, eliminación → `infopulpeclick@gmail.com`.
+
+### Resumen Términos y Condiciones
+
+- PulpeClick es una **plataforma de catálogos**, no vendedor ni fabricante.
+- **Flujo de pedido**: carrito → WhatsApp al vendedor → el vendedor confirma precio/entrega/pago. La transacción es entre comprador y vendedor.
+- **Precios**: indicativos, los establece cada vendedor. PulpeClick no cobra comisión al comprador.
+- **Pagos**: PulpeClick NO procesa pagos (transferencia, efectivo, SINPE móvil directo con vendedor).
+- **Envíos/devoluciones**: los define cada vendedor. PulpeClick no garantiza tiempos ni se responsabiliza.
+- **Responsabilidad limitada**: no responsable por calidad/autenticidad de productos ni incumplimientos del vendedor.
+- **Uso prohibido**: productos ilegales/falsificados, estafas, interferencia técnica.
+- **Ley aplicable**: República de Honduras.
+
+## Scripts utilitarios
+
+Carpeta `scripts/` — scripts Python de utilidad para operar PulpeClick (no son parte del build de Astro).
+
+| Script | Función | Dependencias |
+|---|---|---|
+| `scripts/procesar-imagenes.py` | Quita fondo con IA (rembg u2net), redimensiona a cuadrado 1080px con margen 10%, guarda WebP transparente optimizado | `PIL` (Pillow), `rembg`, `tqdm` |
+| `scripts/generador-qr.py` | Genera QR PNG de la URL del catálogo de una tienda (alta corrección H, 300 DPI) | `qrcode` |
+
+**Nota:** ambos scripts usan variables de configuración al inicio (URL, nombre de archivo, carpetas de origen/destino). No exponen rutas personales. Se editan por tienda/uso.
 
 ## Assets visuales
 
