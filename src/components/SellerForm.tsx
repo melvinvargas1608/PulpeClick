@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, useEffect, useRef, type FormEvent } from 'react'
 import { supabaseClient } from '../lib/supabase-client'
 import { generateSlug } from '../lib/slug'
 import { buildWhatsAppUrl, sanitizePhoneInput } from '../lib/phone'
@@ -21,6 +21,28 @@ export default function SellerForm() {
   const [bannerUrl, setBannerUrl] = useState<string | null>(null)
   const [country, setCountry] = useState('Honduras')
   const [otherCountry, setOtherCountry] = useState('')
+
+  const slugTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const findUniqueSlug = async (baseSlug: string): Promise<string> => {
+    if (!baseSlug) return baseSlug
+
+    const { data } = await supabaseClient
+      .from('sellers')
+      .select('slug')
+      .or(`slug.eq.${baseSlug},slug.like.${baseSlug}-%`)
+
+    if (!data || data.length === 0) return baseSlug
+
+    const existing = new Set(data.map((s) => s.slug))
+    let candidate = baseSlug
+    let counter = 2
+    while (existing.has(candidate)) {
+      candidate = `${baseSlug}-${counter}`
+      counter++
+    }
+    return candidate
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -61,7 +83,14 @@ export default function SellerForm() {
   const handleNameChange = (value: string) => {
     setName(value)
     if (!editId) {
-      setSlug(generateSlug(value))
+      const baseSlug = generateSlug(value)
+      setSlug(baseSlug)
+
+      if (slugTimeoutRef.current) clearTimeout(slugTimeoutRef.current)
+      slugTimeoutRef.current = setTimeout(async () => {
+        const uniqueSlug = await findUniqueSlug(baseSlug)
+        setSlug(uniqueSlug)
+      }, 400)
     }
   }
 
@@ -79,6 +108,20 @@ export default function SellerForm() {
       return
     }
 
+    const normalizedSlug = slug.trim().toLowerCase()
+
+    // Validar que el slug no exista (excluyendo el propio registro en edición)
+    const { data: existingSeller } = await supabaseClient
+      .from('sellers')
+      .select('id')
+      .eq('slug', normalizedSlug)
+      .maybeSingle()
+
+    if (existingSeller && existingSeller.id !== editId) {
+      setError('Ya existe un vendedor con ese slug. Cambiá el nombre o el slug manualmente.')
+      return
+    }
+
     const finalCountry = country === 'Otro' ? otherCountry.trim() : country
     if (!finalCountry) {
       setError('El país es obligatorio')
@@ -92,7 +135,7 @@ export default function SellerForm() {
 
     if (bannerFile) {
       // Upload new banner
-      const uploadedUrl = await uploadBannerImage(bannerFile, slug.trim().toLowerCase())
+      const uploadedUrl = await uploadBannerImage(bannerFile, normalizedSlug)
       if (uploadedUrl) {
         // Delete old banner if it existed
         if (bannerUrl) {
@@ -114,7 +157,7 @@ export default function SellerForm() {
       name: name.trim(),
       phone: phone.trim() || null,
       whatsapp_url: buildWhatsAppUrl(phone),
-      slug: slug.trim().toLowerCase(),
+      slug: normalizedSlug,
       banner_url: finalBannerUrl,
       country: finalCountry,
     }
