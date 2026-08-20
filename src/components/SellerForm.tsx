@@ -27,17 +27,37 @@ export default function SellerForm() {
   const findUniqueSlug = async (baseSlug: string): Promise<string> => {
     if (!baseSlug) return baseSlug
 
-    const { data } = await supabaseClient
+    // 1. ¿El slug base ya existe?
+    const { data: exactMatch, error: err1 } = await supabaseClient
       .from('sellers')
       .select('slug')
-      .or(`slug.eq.${baseSlug},slug.like.${baseSlug}-%`)
+      .eq('slug', baseSlug)
+      .maybeSingle()
 
-    if (!data || data.length === 0) return baseSlug
+    if (err1) {
+      console.error('Error checking slug uniqueness:', err1)
+      return baseSlug
+    }
 
-    const existing = new Set(data.map((s) => s.slug))
+    if (!exactMatch) return baseSlug
+
+    // 2. Buscar todos los sufijos existentes (baseSlug-2, baseSlug-3...)
+    const { data: suffixed, error: err2 } = await supabaseClient
+      .from('sellers')
+      .select('slug')
+      .like('slug', `${baseSlug}-%`)
+
+    if (err2) {
+      console.error('Error checking suffixed slugs:', err2)
+      return `${baseSlug}-2`
+    }
+
+    const existing = new Set<string>([baseSlug])
+    suffixed?.forEach((s) => existing.add(s.slug))
+
     let candidate = baseSlug
     let counter = 2
-    while (existing.has(candidate)) {
+    while (existing.has(candidate) && counter <= 1000) {
       candidate = `${baseSlug}-${counter}`
       counter++
     }
@@ -96,6 +116,8 @@ export default function SellerForm() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (loading) return
+
     setError('')
 
     if (!name.trim()) {
@@ -111,11 +133,16 @@ export default function SellerForm() {
     const normalizedSlug = slug.trim().toLowerCase()
 
     // Validar que el slug no exista (excluyendo el propio registro en edición)
-    const { data: existingSeller } = await supabaseClient
+    const { data: existingSeller, error: slugCheckError } = await supabaseClient
       .from('sellers')
       .select('id')
       .eq('slug', normalizedSlug)
       .maybeSingle()
+
+    if (slugCheckError) {
+      setError('Error al verificar disponibilidad del slug. Intentá de nuevo.')
+      return
+    }
 
     if (existingSeller && existingSeller.id !== editId) {
       setError('Ya existe un vendedor con ese slug. Cambiá el nombre o el slug manualmente.')
