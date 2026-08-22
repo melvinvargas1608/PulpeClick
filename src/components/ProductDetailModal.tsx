@@ -55,7 +55,6 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
     : 0;
 
   const aboutBullets = splitIntoBullets(product?.description);
-  const featureBullets = splitIntoBullets(product?.details);
   const categoryName = product?.categories?.name ?? null;
 
   return (
@@ -134,23 +133,6 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
                           {aboutBullets.map((item, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-700 leading-relaxed">
                               <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" aria-hidden="true" />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </section>
-                    )}
-
-                    {/* Características */}
-                    {featureBullets.length > 0 && (
-                      <section className="mb-5">
-                        <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">
-                          Características
-                        </h3>
-                        <ul className="space-y-1.5">
-                          {featureBullets.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm sm:text-base text-gray-700 leading-relaxed">
-                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-hot" aria-hidden="true" />
                               <span>{item}</span>
                             </li>
                           ))}
