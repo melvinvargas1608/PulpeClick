@@ -15,6 +15,38 @@ interface SellerInfo {
   slug: string;
 }
 
+const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+async function fileToResizedBase64(
+  file: File,
+  maxDim = 1024
+): Promise<{ base64: string; mimeType: string } | null> {
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height))
+    const width = Math.max(1, Math.round(bitmap.width * scale))
+    const height = Math.max(1, Math.round(bitmap.height * scale))
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      bitmap.close()
+      return null
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height)
+    bitmap.close()
+    const mimeType = SUPPORTED_IMAGE_TYPES.includes(file.type) ? file.type : 'image/jpeg'
+    const dataUrl = canvas.toDataURL(mimeType, 0.9)
+    const base64 = dataUrl.split(',')[1] ?? ''
+    if (!base64) return null
+    return { base64, mimeType }
+  } catch (err) {
+    console.error('Error al redimensionar la imagen:', err)
+    return null
+  }
+}
+
 export default function ProductCreateForm() {
   // Seller (loaded from URL params)
   const [sellerSlug, setSellerSlug] = useState('');
@@ -115,6 +147,7 @@ export default function ProductCreateForm() {
       const imagePromise = imageFile ? uploadProductImage(imageFile, sellerSlug) : Promise.resolve(null);
 
       // B: Generate description FIRST
+      const visionData = imageFile ? await fileToResizedBase64(imageFile) : null;
       const descResponse = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,6 +156,7 @@ export default function ProductCreateForm() {
           category: categoryName,
           price: price ? parseFloat(price) : undefined,
           details: productDetails.trim() || undefined,
+          ...(visionData ? { imageBase64: visionData.base64, mimeType: visionData.mimeType } : {}),
         }),
       });
       const descData = await descResponse.json();
