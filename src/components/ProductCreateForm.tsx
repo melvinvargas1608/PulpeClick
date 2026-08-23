@@ -296,7 +296,6 @@ export default function ProductCreateForm() {
             onImageChange={handleImageChange}
             onAvailabilityChange={setIsAvailable}
             disabled={generating}
-            showPriceHint
           />
 
           {formError && <Alert variant="error">{formError}</Alert>}

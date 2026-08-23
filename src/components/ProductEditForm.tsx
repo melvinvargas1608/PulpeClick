@@ -111,6 +111,21 @@ export default function ProductEditForm({ editId }: Props) {
       return;
     }
 
+    if (!categoryId) {
+      setFormError('La categoría es obligatoria');
+      return;
+    }
+
+    if (!price || parseFloat(price) <= 0) {
+      setFormError('El precio es obligatorio');
+      return;
+    }
+
+    if (!productDetails.trim()) {
+      setFormError('Los detalles del producto son obligatorios');
+      return;
+    }
+
     if (originalPrice && price && parseFloat(originalPrice) <= parseFloat(price)) {
       setFormError('El precio original debe ser mayor que el precio actual.');
       return;
@@ -230,7 +245,6 @@ export default function ProductEditForm({ editId }: Props) {
           onImageChange={handleImageChange}
           onAvailabilityChange={setIsAvailable}
           disabled={saving}
-          showPriceHint={false}
         />
 
         {formError && <Alert variant="error">{formError}</Alert>}

@@ -20,7 +20,6 @@ interface ProductBasicFieldsProps extends ProductFieldsData {
   onImageChange: (file: File | null, preview: string | null) => void;
   onAvailabilityChange: (value: boolean) => void;
   disabled?: boolean;
-  showPriceHint?: boolean;
 }
 
 export default function ProductBasicFields({
@@ -39,7 +38,6 @@ export default function ProductBasicFields({
   onImageChange,
   onAvailabilityChange,
   disabled = false,
-  showPriceHint = true,
 }: ProductBasicFieldsProps) {
   const categories = useCategories();
 
@@ -65,7 +63,7 @@ export default function ProductBasicFields({
       {/* Category */}
       <div>
         <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">
-          Categoría
+          Categoría *
         </label>
         <select
           id="categoryId"
@@ -84,7 +82,7 @@ export default function ProductBasicFields({
       {/* Product Details */}
       <div>
         <label htmlFor="productDetails" className="block text-sm font-medium text-gray-700 mb-1">
-          Detalles del producto <span className="text-gray-400 font-normal">(opcional)</span>
+          Detalles del producto *
         </label>
         <textarea
           id="productDetails"
@@ -103,7 +101,7 @@ export default function ProductBasicFields({
       {/* Price */}
       <div>
         <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-          Precio (Lempiras)
+          Precio (Lempiras) *
         </label>
         <input
           id="price"
@@ -111,16 +109,11 @@ export default function ProductBasicFields({
           value={price}
           onChange={(e) => onPriceChange(e.target.value)}
           className="w-full px-3 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-brand focus:border-brand outline-none"
-          placeholder={showPriceHint ? "Dejá en blanco para que la IA lo sugiera" : "0.00"}
+          placeholder="Ej: 1200.00"
           min="0"
           step="0.01"
           disabled={disabled}
         />
-        {showPriceHint && !price && (
-          <p className="text-xs text-gray-400 mt-1">
-            Si no ponés precio, la IA te sugerirá uno
-          </p>
-        )}
       </div>
 
       {/* Original Price */}
