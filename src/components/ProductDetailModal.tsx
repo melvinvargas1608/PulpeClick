@@ -98,7 +98,7 @@ export default function ProductDetailModal({ product, isOpen, onClose, currency 
               <div className="flex-1 overflow-y-auto">
                 <div className="flex flex-col md:flex-row">
                   {/* Image */}
-                  <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center shrink-0">
+                  <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center shrink-0 p-6">
                     {product.image_url ? (
                       <img
                         src={product.image_url}
