@@ -106,7 +106,3 @@ export function productDescriptionPromptWithImage(productName: string, category:
     `${visionBlock}\n\nDescripción (3 a 5 viñetas, una por línea):`
   )
 }
-
-export function suggestPricePrompt(productName: string, category: string, description: string): string {
-  return `Eres un asesor de precios para productos en Honduras. Basado en la descripción y categoría, sugiere un precio de venta justo en Lempiras (L). Solo responde con el número (ej: 350). No escribas nada más.\n\nProducto: ${productName}\nCategoría: ${category}\nDescripción: ${description}\n\nPrecio sugerido (solo número):`
-}

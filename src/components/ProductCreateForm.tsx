@@ -15,36 +15,17 @@ interface SellerInfo {
   slug: string;
 }
 
-const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
-async function fileToResizedBase64(
-  file: File,
-  maxDim = 1024
-): Promise<{ base64: string; mimeType: string } | null> {
-  try {
-    const bitmap = await createImageBitmap(file)
-    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height))
-    const width = Math.max(1, Math.round(bitmap.width * scale))
-    const height = Math.max(1, Math.round(bitmap.height * scale))
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      bitmap.close()
-      return null
-    }
-    ctx.drawImage(bitmap, 0, 0, width, height)
-    bitmap.close()
-    const mimeType = SUPPORTED_IMAGE_TYPES.includes(file.type) ? file.type : 'image/jpeg'
-    const dataUrl = canvas.toDataURL(mimeType, 0.9)
-    const base64 = dataUrl.split(',')[1] ?? ''
-    if (!base64) return null
-    return { base64, mimeType }
-  } catch (err) {
-    console.error('Error al redimensionar la imagen:', err)
-    return null
-  }
+function fileToBase64(file: File): Promise<string | null> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1] ?? '';
+      resolve(base64 || null);
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
 }
 
 export default function ProductCreateForm() {
@@ -71,7 +52,6 @@ export default function ProductCreateForm() {
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState('');
   const [description, setDescription] = useState('');
-  const [suggestedPrice, setSuggestedPrice] = useState<number | null>(null);
 
   // Save state
   const [saving, setSaving] = useState(false);
@@ -135,6 +115,26 @@ export default function ProductCreateForm() {
       return;
     }
 
+    if (!categoryId) {
+      setFormError('La categoría es obligatoria');
+      return;
+    }
+
+    if (!price || parseFloat(price) <= 0) {
+      setFormError('El precio es obligatorio');
+      return;
+    }
+
+    if (!productDetails.trim()) {
+      setFormError('Los detalles del producto son obligatorios');
+      return;
+    }
+
+    if (!imageFile) {
+      setFormError('La imagen del producto es obligatoria');
+      return;
+    }
+
     setGenerating(true);
     setStep(2);
 
@@ -146,8 +146,8 @@ export default function ProductCreateForm() {
       // A: Upload image (parallel, non-blocking)
       const imagePromise = imageFile ? uploadProductImage(imageFile, sellerSlug) : Promise.resolve(null);
 
-      // B: Generate description FIRST
-      const visionData = imageFile ? await fileToResizedBase64(imageFile) : null;
+      // B: Generate description with image vision
+      const imageBase64 = imageFile ? await fileToBase64(imageFile) : null;
       const descResponse = await fetch('/api/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,7 +156,7 @@ export default function ProductCreateForm() {
           category: categoryName,
           price: price ? parseFloat(price) : undefined,
           details: productDetails.trim() || undefined,
-          ...(visionData ? { imageBase64: visionData.base64, mimeType: visionData.mimeType } : {}),
+          ...(imageBase64 && imageFile ? { imageBase64, mimeType: imageFile.type } : {}),
         }),
       });
       const descData = await descResponse.json();
@@ -168,30 +168,11 @@ export default function ProductCreateForm() {
       const generatedDescription = descData.description || '';
       setDescription(generatedDescription);
 
-      // C: Generate price and upload image IN PARALLEL
-      const [priceResult, imageUrl] = await Promise.allSettled([
-        price
-          ? Promise.resolve({ price: parseFloat(price) })
-          : fetch('/api/suggest-price', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                productName: productName.trim(),
-                category: categoryName,
-                description: generatedDescription,
-              }),
-            }).then((r) => r.json()),
-
-        imagePromise,
-      ]);
-
-      if (priceResult.status === 'fulfilled' && !priceResult.value.error) {
-        setSuggestedPrice(priceResult.value.price || null);
-      }
-
-      if (imageUrl.status === 'fulfilled' && imageUrl.value) {
-        sessionStorage.setItem(`product-image-${productName.trim()}`, imageUrl.value);
-        setUploadedImageUrl(imageUrl.value);
+      // C: Wait for image upload to Storage
+      const imageUrl = await imagePromise;
+      if (imageUrl) {
+        sessionStorage.setItem(`product-image-${productName.trim()}`, imageUrl);
+        setUploadedImageUrl(imageUrl);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -230,7 +211,7 @@ export default function ProductCreateForm() {
           seller_id: seller.id,
           name: productName.trim(),
           description: description || null,
-          price: suggestedPrice || null,
+          price: price ? parseFloat(price) : null,
           original_price: originalPrice ? parseFloat(originalPrice) : null,
           category_id: categoryId || null,
           image_url: imageUrl,
@@ -267,7 +248,6 @@ export default function ProductCreateForm() {
     setUploadedImageUrl(null);
     setIsAvailable(true);
     setDescription('');
-    setSuggestedPrice(null);
     setSaved(false);
     setSaveError('');
     setGenError('');
@@ -376,11 +356,6 @@ export default function ProductCreateForm() {
                 {categories.find((c) => c.id === categoryId)?.name}
               </span>
             )}
-            {suggestedPrice && (
-              <p className="text-xl font-bold text-hot mt-2">
-                L {suggestedPrice.toFixed(2)}
-              </p>
-            )}
           </div>
 
           {/* Description */}
@@ -401,7 +376,7 @@ export default function ProductCreateForm() {
               <h3 className="font-semibold text-gray-900 mb-3">📱 Imagen para WhatsApp</h3>
               <PostImageGenerator
                 productName={productName}
-                price={(suggestedPrice ?? Number(price)) || 0}
+                price={Number(price) || 0}
                 imageUrl={uploadedImageUrl || undefined}
                 postText=""
                 description={description}
