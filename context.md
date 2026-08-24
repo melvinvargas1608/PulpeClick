@@ -20,7 +20,7 @@ Servicio de **catálogos digitales con IA** para emprendedores de Centroamérica
 | Base de datos | Supabase (PostgreSQL) con tipos generados |
 | Almacenamiento | Supabase Storage (buckets `products`, `banners`) |
 | Autenticación admin | Cookie `admin_auth` + PIN en .env |
-| IA | Gemini API (`gemini-3.5-flash-lite`) |
+| IA | Gemini API (`gemini-3.5-flash-lite`, texto + visión) |
 | Hosting | Vercel (adapter `@astrojs/vercel`) |
 | Package manager | npm (lock file) |
 
@@ -137,10 +137,14 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 
 ### Generación con IA
 
-1. Admin sube producto: nombre, categoría (UUID FK), detalles, precio opcional, foto
-2. Gemini genera: descripción (100 palabras, tono factual) + precio sugerido (si no se especificó)
-3. Se guarda en `products` con `category_id` (FK) y `details`
-4. Se genera tarjeta PNG descargable (PostImageGenerator) con descripción generada
+1. Admin sube producto: nombre, categoría (UUID FK), detalles, precio (obligatorio), foto (obligatoria)
+2. Gemini 3.5 Flash Lite analiza la **foto** (visión, base64 sin redimensionar) + datos de texto → genera descripción "Sobre este artículo" (3-5 viñetas, máx 70 palabras, enfocada SOLO en el objeto principal, ignora fondo)
+3. Las **reglas** del redactor viven en `systemInstruction` (`productDescriptionSystemPrompt`) y los **datos** del producto en `contents` (`productDescriptionUserPrompt`) — separados para evitar que el modelo repita las instrucciones
+4. `sanitizeUserInput` filtra texto contaminado (etiquetas `<system-reminder>`, HTML) de los datos ANTES de interpolar; `sanitizeDescriptionOutput` limpia la respuesta del modelo antes de guardar
+5. Todos los campos son obligatorios excepto **precio original** (solo para ofertas)
+6. Se guarda en `products` con `category_id` (FK) y `details`
+7. La descripción generada es **editable** en el paso 2 (textarea) antes de guardar
+8. Se genera tarjeta PNG descargable (PostImageGenerator) con descripción generada
 
 ### Catálogo Público (`/catalogo/[slug]`)
 
@@ -180,8 +184,7 @@ Definidos en `src/styles/global.css` con `@theme` de Tailwind v4.
 
 ### API Endpoints
 
-- `/api/generate-description` — Gemini: descripción de producto
-- `/api/suggest-price` — Gemini: precio sugerido
+- `/api/generate-description` — Gemini 3.5 Flash Lite (texto + visión): descripción de producto
 - `/api/verify-pin` — verifica PIN admin
 - `/api/delete-product` — elimina producto + imagen storage
 
@@ -244,8 +247,7 @@ src/
 │   │   ├── nuevo-producto.astro, productos.astro, editar-producto.astro
 │   │   └── categorias.astro
 │   └── api/
-│       ├── generate-description.ts, suggest-price.ts
-│       ├── verify-pin.ts, delete-product.ts
+│       ├── generate-description.ts, verify-pin.ts, delete-product.ts
 └── styles/
     └── global.css             # Tailwind v4 base
 ```
@@ -319,6 +321,17 @@ pnpm run build        # Build para producción
 45. **`h-full` en grid item**: interfiere con la resolución del track height del grid padre en mobile. Para que la card interna (`grid-rows-[auto_1fr_auto]`) distribuya bien el `1fr`, NO confiar solo en `h-full` — la fila del título con `1fr` absorbe las diferencias de alto entre títulos.
 46. **Modal de detalle**: overlay con `Escape`, clic fuera, botón flotante X. Panel `flex-col sm:flex-row`. Cierre con animación de 300ms (`setTimeout` para limpiar el producto seleccionado).
 47. **Disponibilidad de producto**: toggle `is_available` en admin (ProductBasicFields, create y edit). El admin lo ajusta a pedido del vendedor por WhatsApp — no hay login de vendedor.
+48. **Bug slug duplicado en vendedores**: el error `duplicate key value violates unique constraint "clients_slug_key"` (nombre heredado de la migración `005` que renombró `clients`→`sellers` sin renombrar la constraint) aparecía al crear un vendedor cuyo slug ya existía. Fix en `SellerForm.tsx`: (a) auto-sufijo numérico (`-2`, `-3`…) al generar el slug desde el nombre con `findUniqueSlug`, (b) pre-validación de unicidad en `handleSubmit` antes del insert/update, (c) guard de doble-submit `if (loading) return`. El `.or()` original de Supabase era frágil → se reemplazó por dos queries separadas (`eq` + `like`) con captura explícita de errores. No se tocó la BD (la constraint se mantiene).
+49. **Gemini Vision (3.6-flash)**: el modelo default es `gemini-3.6-flash` (texto + visión). Para analizar imagen, `generateContent` arma `parts` dinámicamente: texto primero, luego `{ inlineData: { mimeType, data } }`. La imagen llega como base64 SIN redimensionar (el usuario edita a 1080×1080 WebP sin fondo). Prompt de visión: enfocarse SOLO en el objeto principal, ignorar fondo/objetos/entorno, no inventar.
+50. **Sin redimensionado de imagen**: quité `fileToResizedBase64` (canvas 1024px) porque el usuario ya sube 1080×1080 WebP sin fondo — re-escalar perdía calidad y no ahorraba tokens (ambas usan 4 tiles de 768px). Ahora `fileToBase64` con `FileReader.readAsDataURL` envía el archivo tal cual.
+51. **Sin sugerencia de precio IA**: eliminé el flujo completo (`/api/suggest-price`, `suggestPricePrompt`, estado `suggestedPrice`). El precio es obligatorio en el formulario. Todos los campos son obligatorios excepto `original_price`.
+52. **Labels obligatorios**: `ProductBasicFields` muestra asterisco en nombre, categoría, precio, detalles. Placeholder de precio ahora `"Ej: 1200.00"` (ya no "dejá en blanco para que la IA lo sugiera"). Se quitó la prop `showPriceHint`.
+53. **Modal padding**: el contenedor de la imagen del modal (`ProductDetailModal`) usa `p-4` — antes sin padding las imágenes CON fondo se veían pegadas a los bordes; las transparentes se veían bien porque `bg-gray-50` actuaba de marco.
+54. **PENDIENTE — moneda en label**: el label "Precio (Lempiras)" de `ProductBasicFields` está hardcodeado. El catálogo sí usa `getCurrencySymbol(country)` (L, Q, $, ₡, C$, B/.). El formulario debería recibir la moneda/país del vendedor para mostrar el label y placeholder correctos.
+55. **Inyección de prompts en descripciones**: el texto `<system-reminder># Plan Mode...` (recordatorio que opencode inyecta en las conversaciones) se colaba en el catálogo porque el campo `details` lo arrastraba (autofill/copy de chats de IA) y el prompt de Gemini lo reflejaba (decía "usá SOLO la información proporcionada"). Fix de defensa en profundidad: (a) `sanitizeUserInput` elimina etiquetas `<...>` y bloques tipo reminder de los datos antes de interpolar, (b) `autoComplete="off"` en el textarea de detalles, (c) `sanitizeDescriptionOutput` limpia la respuesta del modelo (tags, símbolos de viñeta, máx 6 líneas/500 chars).
+56. **Instruction echoing en Gemini 3.6 Flash**: con el prompt lleno de prohibiciones ("NO uses emojis", "NO uses guiones"...) + `temperature: 0.85`, el modelo 3.6-flash (que tiene Thinking) empezó a REPETIR las instrucciones ("No emojis. No...") en vez de seguirlas. 3.5-flash-lite (sin Thinking) no lo hacía. Fix: (a) volver a `gemini-3.5-flash-lite` como default, (b) mover las reglas a `systemInstruction` (campo nativo de la API), (c) redactar las reglas en positivo y con ejemplo few-shot, (d) mantener `temperature: 0.85` (decisión explícita del usuario). El usuario prueba en producción (Vercel auto-deploy desde main).
+57. **Estructura del prompt de descripción**: `generateContent` acepta `systemPrompt` (reglas → `systemInstruction` en el body) y `prompt` (datos del usuario → `contents`). Exporta `productDescriptionSystemPrompt()`, `productDescriptionUserPrompt(...)` (con `withVision` para agregar instrucciones de visión) y `sanitizeUserInput`/`sanitizeDescriptionOutput`. Endpoint `generate-description.ts` arma ambos.
+58. **La imagen SIEMPRE se lee**: el formulario exige foto (`if (!imageFile)` en ProductCreateForm), se envía como base64 sin redimensionar y Gemini la analiza con visión. La API soporta generar sin imagen, pero la UI no lo permite hoy. Si algún día se quiere imagen opcional, solo hay que quitar esa validación.
 
 ## Próximos pasos
 
