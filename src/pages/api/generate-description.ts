@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { generateContent, productDescriptionPrompt, productDescriptionPromptWithImage, sanitizeDescriptionOutput } from '../../lib/gemini'
+import { generateContent, productDescriptionSystemPrompt, productDescriptionUserPrompt, sanitizeDescriptionOutput } from '../../lib/gemini'
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -14,12 +14,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const hasImage = Boolean(imageBase64 && mimeType)
-    const prompt = hasImage
-      ? productDescriptionPromptWithImage(productName, category, price, details)
-      : productDescriptionPrompt(productName, category, price, details)
 
     const rawDescription = await generateContent({
-      prompt,
+      prompt: productDescriptionUserPrompt(productName, category, price, details, undefined, hasImage),
+      systemPrompt: productDescriptionSystemPrompt(),
       maxTokens: 300,
       ...(hasImage ? { imageBase64, mimeType } : {})
     })
