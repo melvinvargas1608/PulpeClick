@@ -363,8 +363,17 @@ export default function ProductCreateForm() {
               <h4 className="text-sm font-semibold text-gray-500 uppercase mb-2">
                 Descripción
               </h4>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {description}
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 leading-relaxed focus:ring-2 focus:ring-brand focus:border-brand outline-none resize-y"
+                rows={Math.min(6, Math.max(3, description.split('\n').length + 1))}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Podés editar la descripción generada antes de guardar. Un punto por línea.
               </p>
             </div>
           )}

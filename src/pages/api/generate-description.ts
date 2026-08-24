@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { generateContent, productDescriptionPrompt, productDescriptionPromptWithImage } from '../../lib/gemini'
+import { generateContent, productDescriptionPrompt, productDescriptionPromptWithImage, sanitizeDescriptionOutput } from '../../lib/gemini'
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -18,11 +18,21 @@ export const POST: APIRoute = async ({ request }) => {
       ? productDescriptionPromptWithImage(productName, category, price, details)
       : productDescriptionPrompt(productName, category, price, details)
 
-    const description = await generateContent({
+    const rawDescription = await generateContent({
       prompt,
       maxTokens: 300,
       ...(hasImage ? { imageBase64, mimeType } : {})
     })
+
+    // Limpia la salida: quita bloques de sistema, etiquetas HTML y texto inyectado
+    const description = sanitizeDescriptionOutput(rawDescription)
+
+    if (!description) {
+      return new Response(JSON.stringify({ error: 'La IA no generó una descripción válida' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
 
     return new Response(JSON.stringify({ description }), {
       status: 200,

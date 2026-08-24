@@ -92,6 +92,9 @@ export default function ProductBasicFields({
           placeholder="Ejemplo: material, tamaño, color, usos, etc."
           rows={3}
           disabled={disabled}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
         />
         <p className="text-xs text-gray-400 mt-1">
           La IA usará estos datos para generar una descripción más precisa
